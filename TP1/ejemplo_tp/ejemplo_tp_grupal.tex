@@ -29,6 +29,23 @@
 \section{Ejemplo de sección}
 \subsection{Subsección: ambientes comunes de \LaTeX}
 
+\begin{proc}{hayCamino}{\In distancias : \TLista{\TLista}, \In desde : \ent, \In hasta : \ent}{\bool}
+	%    \modifica{parametro1, parametro2,..}
+	\requiere{expresionBooleana1}
+	\asegura{res = True \iff ((desde \neq hasta) \land \\ (\existe[unalinea]{camino}{\TLista{\ent}}{|camino| \geq 2 \wedge (esCamino(distancias, desde, hasta, camino))}))}
+
+
+\end{proc}
+
+\pred{esCamino}{\In distancias : \TLista{\TLista}, \In desde : \ent, \In hasta : \ent, \In camino : \TLista{\TLista}}
+	{ciudadesValidas(camino, |distancia|) \yLuego \\
+	(paresConectados(distancias, camino) \land \\
+	camino[0] = desde \land\\
+	camino[|camino| - 1])} 
+
+\pred{paresConectados}{\In distancias : \TLista{\TLista}, \In camino : \TLista{\TLista}}
+	{\paraTodo[unalinea]{i}{\ent}{0 \leq i \le |camino| - 1 \implicaLuego distancias[camino[i]][camino[i + 1]] \ge 0}}
+
 Lo principal: las fórmulas. Se puede poner en una linea, como $x_i = x_{i-1} + x_{i-2}$, o ponerse más grande:
 
 \begin{equation}
