@@ -26,25 +26,128 @@
 
 \maketitle
 
-\section{Ejemplo de sección}
-\subsection{Subsección: ambientes comunes de \LaTeX}
+\section{Especifiación}
+\subsection{Ejercicio 1}
 
-\begin{proc}{hayCamino}{\In distancias : \TLista{\TLista}, \In desde : \ent, \In hasta : \ent}{\bool}
-	%    \modifica{parametro1, parametro2,..}
-	\requiere{expresionBooleana1}
-	\asegura{res = True \iff ((desde \neq hasta) \land \\ (\existe[unalinea]{camino}{\TLista{\ent}}{|camino| \geq 2 \wedge (esCamino(distancias, desde, hasta, camino))}))}
-
-
+\begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad}}{\TLista{Ciudad}}
+	\requiere{noHayNombresRepetidos(ciudades) \land habitantesNoNegativos(ciudades)}
+	\asegura{C \in res \iff (C \in ciudades \land C.habitantes > 50.000)}
 \end{proc}
 
-\pred{esCamino}{\In distancias : \TLista{\TLista}, \In desde : \ent, \In hasta : \ent, \In camino : \TLista{\TLista}}
-	{ciudadesValidas(camino, |distancia|) \yLuego \\
-	(paresConectados(distancias, camino) \land \\
-	camino[0] = desde \land\\
-	camino[|camino| - 1])} 
+\pred{noHayNombresRepetidos}{\In listaDeCiudades : \TLista{Ciudad}}
+{\paraTodo[unalinea]{elemento}{Ciudad}{elemento \in listaDeCiudades \implicaLuego \\
+(\paraTodo[unalinea]{otroElmento}{Ciudad}{(otroElemento \in listaDeCiudades \land otroElemento \neq elemento) \implicaLuego \\ (elemento.nombre \neq otroElemento.nombre)})}}
 
-\pred{paresConectados}{\In distancias : \TLista{\TLista}, \In camino : \TLista{\TLista}}
-	{\paraTodo[unalinea]{i}{\ent}{0 \leq i \le |camino| - 1 \implicaLuego distancias[camino[i]][camino[i + 1]] \ge 0}}
+\pred{habitantesNoNegativos}{\In listaDeCiudades : \TLista{Ciudad}}
+{\paraTodo[unalinea]{elemento}{Ciudad}{elemento \in listaDeCiudades \implicaLuego elemento.habitantes \ge 0}}
+
+\subsection{Ejercicio 2}
+
+\begin{proc}{sumaDeHabitantes}{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{\TLista{Ciudad}}
+	\requiere{noHayNombresRepetidos(mayoresDeCiudades) \land habitantesNoNegativos(mayoresDeCiudades) \land \\
+	noHayNombresRepetidos(menoresDeCiudades) \land habitantesNoNegativos(menoresDeCiudades)}
+	\requiere{|menoresDeCiudades| = |mayoresDeCiudades| \yLuego \\ mismosNombres(menoresDeCiudades, mayoresDeCiudades)}
+	\asegura{|res| = |menoresDeCiudades| \land mismosNombres(res, menoresDeCiudades) \land \\ habitantesSumados(res, menoresDeCiudades, mayoresDeCiudades)}
+\end{proc}
+
+\pred{mismosNombres}{\In listaDeCiudades1 : \TLista{Ciudad}, \In listaDeCiudades2 : \TLista{Ciudad}}
+{\paraTodo[unalinea]{elemento}{Ciudad}{elemento \in listaDeCiudades1 \implicaLuego \\
+ \existe[unalinea]{otroElemento}{Ciudad}{otroElemento \in listaDeCiudades2 \yLuego elemento.nombre = otroElemento.nombre }}}
+
+\pred{habitantesSumados}{\In listaSuma : \TLista{Ciudad}, \In listaMenores : \TLista{Ciudad}, \In listaMayores : \TLista{Ciudad}}
+{\paraTodo[unalinea]{ciudadSuma}{Ciudad}{ciudadSuma \in listaSuma \implicaLuego \\
+ \existe[unalinea]{ciudadMenor, ciudadMayor}{Ciudad}{(ciudadMenor \in listaMenores \land ciudadMayor \in listaMayores) \land \\ 
+ ciudadSuma.nombre = ciudadMenor.nomobre \land ciudadSuma.nombre = ciudadMenor.nombre \land \\
+ ciudadSuma.habitantes = ciudadMenor.habitantes + ciudadMayor.habitantes}}}
+
+\subsection{Ejercicio 3}
+
+\begin{proc}{hayCamino}{\In distancias : \TLista{\TLista{\ent}}, \In desde : \ent, \In hasta : \ent}{\bool}
+	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land \\ diagonalEsCero(distancias) \land \\ valoresNoNegativos(distancias))}
+	\asegura{res = True \iff \existe[unalinea]{camino}{\TLista{\ent}}{|camino| \geq 2 \wedge (esCamino(distancias, desde, hasta, camino))}}
+\end{proc}
+
+\pred{esCuadrada}{\In matriz : \TLista{\TLista{\ent}}}
+{\paraTodo[unalinea]{fila}{\ent}{0 \leq fila < |matriz| \implicaLuego |matriz[fila]| = |matriz|}}
+
+\pred{esSimetrica}{\In matriz : \TLista{\TLista{\ent}}}
+{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego matriz[i][j] = matriz[j][i]}}
+
+\pred{diagonalEsCero}{\In matriz : \TLista{\TLista{\ent}}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matriz| \implicaLuego matriz[i][i] = 0}}
+
+\pred{valoresNoNegativos}{\In matriz : \TLista{\TLista{\ent}}}
+{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego matriz[i][j] \ge 0}}
+
+\pred{esCamino}{\In distancias : \TLista{\TLista{\ent}}, \In desde : \ent, \In hasta : \ent, \In camino : \TLista{\ent}}
+{ciudadesValidas(camino, |distancia|) \yLuego \\
+(paresConectados(distancias, camino) \land \\
+camino[0] = desde \land\\
+camino[|camino| - 1] = hasta)} 
+
+\pred{paresConectados}{\In distancias : \TLista{\TLista{\ent}}, \In camino : \TLista{\ent}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| - 1 \implicaLuego distancias[camino[i]][camino[i + 1]] > 0}}
+
+\pred{ciudadesValidas}{\In camino : \TLista{\ent}, \In longitud : \ent}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| \implicaLuego camino[i] < longitud}}
+
+
+\subsection{Ejercicio 4}
+
+Para este ejercicio usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con P una matriz y 
+D una matriz diagonal, es decir, que todos sus valores son cero menos en la diagonal, se cumple que la diagonal
+de D tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$. \\
+Notar que no todas las matrices son diagonalizables, pero sí lo son aquellas que son cuadradas y simétricas,
+es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este programa lo son.
+
+\begin{proc}{cantidadCaminosNSaltos}{\Inout conexion : \TLista{\TLista{\ent}}, \In n : \ent}{}
+	\requiere{conexion = C_{0}}
+	\requiere{esCuadrada(conexion) \yLuego \\ (esSimetrica(conexion) \land \\ diagonalEsCero(conexion) \land \\ todosCerosOUnos(conexion))}
+	\asegura{\existe[]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{(|C_{0}| = |P| \land
+	|C_{0}| = |PInversa| \land |C_{0}| = |diagonal| \land |C_{0}| = |diagonalElevada| \land \\
+	esCuadrada(P) \land esCuadrada(PInversa) \land esCuadrada(diagonal) \land esCuadrada(diagonalElevada)) \yLuego \\
+	esInversa(P, PInversa) \land \\
+	esDiagonal(diagonal) \land \\
+	esDiagonalElevada(diagonal, diagonalElevada, n) \land \\
+	esProductoTripleDeMatrices(P, diagonal, PInversa, C_{0}) \land \\
+	esProductoTripleDeMatrices(P, diagonalElevada, PInversa, conexion)}}
+\end{proc}
+
+\pred{todosCerosOUnos}{\In matriz : \TLista{\TLista{\ent}}}
+{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego (matriz[i][j] = 0 \lor matriz[i][j] = 1)}}
+
+Para el siguiente predicado usaremos que $A*A^{-1} = I$ donde I es la matriz identidad.
+
+\pred{esInversa}{\In matrizOriginal : \TLista{\TLista{\ent}}, \In matrizInversa : \TLista{\TLista{\ent}}}
+{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizOriginal| \implicaLuego \\ 
+((i = j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 1) \lor \\
+(i \neq j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 0))}}
+
+\pred{esDiagonal}{\In matriz : \TLista{\TLista{\ent}}}
+{\paraTodo[unalinea]{i, j}{\ent}{(0 \leq i, j < |matriz| \land i \neq j) \implicaLuego matriz[i][j] = 0}}
+
+\pred{esDiagonalElevada}{\In matrizDiagonal : \TLista{\TLista{\ent}}, \In matrizDiagonalElevada : \TLista{\TLista{\ent}}, \In n : \ent}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matrizDiagonal| \implicaLuego matrizDiagonalElevada[i][i] = (matrizDiagonal[i][i])^{n}}}
+
+\pred{esProductoDeMatrices}{\In matrizFactor1 : \TLista{\TLista{\ent}}, \In matrizFactor2 : \TLista{\TLista{\ent}}, \In matrizProducto : \TLista{\TLista{\ent}}}
+{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
+(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
+
+\pred{esProductoTripleDeMatrices}{\In matrizFactor1 : \TLista{\TLista{\ent}}, \In matrizFactor2 : \TLista{\TLista{\ent}}, \In matrizFactor3 : \TLista{\TLista{\ent}},
+\In matrizProducto : \TLista{\TLista{\ent}}}
+{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
+(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
+esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
+
+\subsection{Ejercicio 5}
+
+\begin{proc}{caminoMinimo}{\In origen : \ent, \In destino : \ent, \In distancias : \TLista{\TLista{\ent}}}{\TLista{\ent}}
+	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land \\ diagonalEsCero(distancias) \land \\ valoresNoNegativos(distancias))}
+	\asegura{(esCamino(res, distancias, origen, destino \land \\
+	\paraTodo[unalinea]{camino}{\TLista{\ent}}{distanciaRecorrida (camino) \ge distanciaRecorrida (res)}))}
+\end{proc}
+
+
 
 Lo principal: las fórmulas. Se puede poner en una linea, como $x_i = x_{i-1} + x_{i-2}$, o ponerse más grande:
 
