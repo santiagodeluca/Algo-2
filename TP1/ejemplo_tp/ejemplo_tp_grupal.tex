@@ -1,4 +1,5 @@
 \documentclass[10pt,a4paper]{article}
+\usepackage{amssymb}
 
 \input{AEDmacros}
 \usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
@@ -13,7 +14,7 @@
 \grupo{FOREJOLKBXQRUOORILHN}
 
 \integrante{De Luca, Santiago Leonel}{4/24}{santidelu510@gmail.com}
-\integrante{Lopez, Leandro}{30/24}{lopezingrid343@gmail.com}
+\integrante{Lopez, Leandro}{30/24}{lean4405@gmail.com}
 \integrante{Cataldi Gagliardi, Franco}{317/24}{franco-cataldi@hotmail.com}
 \integrante{Lopez, Ingrid Raquel Gloria}{529/24}{lopezingrid343@gmail.com}
 % Pongan cuantos integrantes quieran
@@ -101,12 +102,13 @@ es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
 	\requiere{conexi\acute{o}n = C_{0}}
-	\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land \\ diagonalEsCero(conexi\acute{o}n) \land \\ todosCerosOUnos(conexi\acute{o}n))}
+	\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
 	\asegura{\existe[]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{(|C_{0}| = |P| \land
 	|C_{0}| = |PInversa| \land |C_{0}| = |diagonal| \land |C_{0}| = |diagonalElevada| \land \\
 	esCuadrada(P) \land esCuadrada(PInversa) \land esCuadrada(diagonal) \land esCuadrada(diagonalElevada)) \yLuego \\
 	esInversa(P, PInversa) \land \\
 	esDiagonal(diagonal) \land \\
+	esDiagonal(diagonalElevada) \land \\
 	esDiagonalElevada(diagonal, diagonalElevada, n) \land \\
 	esProductoTripleDeMatrices(P, diagonal, PInversa, C_{0}) \land \\
 	esProductoTripleDeMatrices(P, diagonalElevada, PInversa, conexi\acute{o}n)}}
@@ -158,11 +160,108 @@ esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
 	
 \end{proc}
 
-\vspace{4cm}
+\section{Demostraciones de correctitud}
+\subsection{Ejercicio 1}
+Para demostrar la correctitud de la implementaci\'on con respecto a la especificaci\'on utilizaremos
+el teorema del invariante y el teorema de terminaci\'on. Con respecto a nuestro programa, llamamos:
+\vspace{0.3cm}\\
+$P_{c} \equiv \{i = 0 \land res = 0\}$\\
+$Q_{c} \equiv \{res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\}$\\
+$B \equiv \{i < |ciudades|\}$\\
+$\neg B \equiv \{i \ge |ciudades|\}$\\
+$S1 \equiv res := res + ciudades[i].habitantes$\\
+$S2 \equiv i := i + 1$\\
+$S \equiv S1; S2$
+\vspace{0.3cm}
 
-ACÁ TERMINA EL TP IGNOREN LO QUE SIGUE, LO DEJE POR SI ME SIRVE DESPUES PARA HACER ALGO MÁS 
+
+Proponemos el siguiente invariante: \\
+\begin{equation}
+	I \equiv \{0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes\}
+\end{equation}
+
+\begin{enumerate} \setlength\itemsep{0cm}
+	\item $P_{c} \implies I$\\
+	$(i = 0 \land res = 0) \implies (0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$
+	\begin{itemize}
+		\item $i = 0 \implies 0 \le 0 \le |ciudades| \ \checkmark$ 
+		\item $i = 0 \implies res = \sum\nolimits_{j=0}^{- 1} ciudades[j].habitantes \implies res = 0 \ \checkmark$
+	\end{itemize}
+	\item $\{I \land B\}S\{I\} \iff \{I \land B\} \implies wp(S,I)$
+	\vspace{0.3cm}\\
+	Buscamos $wp(S, I) \equiv\\ 
+	\equiv wp(S1;S2, I) \\
+	\overset{\text{AX3}}{\equiv} wp(S1, wp(S2, I))\\
+	\equiv wp(S1, wp(i := i + 1, 0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes))\\
+	\overset{\text{AX1}}{\equiv} wp(S1, def(i + 1) \yLuego (0 \le i + 1 \le |ciudades| \land res = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes))\\
+	\equiv wp(res := res + ciudades[i].habitantes, 0 \le i + 1 \le |ciudades| \land res = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes)\\
+	\overset{\text{AX1}}{\equiv} def(ciudades[i].habitantes) \yLuego (0 \le i + 1 \le |ciudades| \land res + ciudades[i].habitantes = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes)\\
+	\equiv 0 \le i < |ciudades| \yLuego (-1 \le i < |ciudades| \land res + ciudades[i].habitantes = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes)\\
+	\equiv 0 \le i < |ciudades| \yLuego res  = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes + ciudades[i].habitantes - ciudades[i].habitantes\\
+	\equiv 0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes$
+	\vspace{0.3cm}\\
+	Finalmente, veamos que $\{I \land B\} \implies wp(S,I)$\\
+	$(0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes \land i < |ciudades|) \implies wp(S,I)$\\
+	$(0 \le i < |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes) \implies (0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$\\
+	El predecente y el consecuente de esta implicacai\'on son id\'enticos, por lo tanto es una tautolog\'ia. \checkmark
+	\item $I \land \neg B \implies Q_{c}\\
+	(0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes \land i \ge |ciudades|) \implies Q_{c}\\
+	(|ciudades| \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes|) \implies Q_{c}\\
+	(i = |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes|) \implies Q_{c}\\
+	res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \implies res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\\$
+	De nuevo, el predecente y el consecuente de esta implicacai\'on son id\'enticos, por lo tanto es una tautolog\'ia. \checkmark
+\end{enumerate}
+Queda demostrado parcialmente el progama. Para demostrar que este es v\'alido utilizaremos el teorema de terminaci\'on. 
+Proponemos la siguiente funci\'on variante:\\
+\begin{equation}
+		f_{v} = |ciudades| - i
+	\end{equation}
+
+	\begin{enumerate} \setlength\itemsep{0cm}
+		\item $\{I \land B \land v_{0} = f_{v}\}S\{f_{v} < v_{0}\} \iff \{I \land B \land v_{0} = f_{v}\} \implies wp(S, f_{v} < v_{0})$
+		\vspace{0.3cm}\\
+		Buscamos $wp(S, f_{v} < v_{0}) \equiv\\$
+		$\equiv wp(S1;S2, |ciudades| - i < v_{0})\\
+		\overset{\text{AX3}}{\equiv} wp(S1, wp(S2, |ciudades| - i < v_{0}))\\
+		\equiv wp(S1, wp(i := i + 1, |ciudades| - i < v_{0}))\\
+		\overset{\text{AX1}}{\equiv} wp(S1, def(i + 1) \yLuego |ciudades| - (i + 1) < v_{0})\\
+		\equiv wp(res := res + ciudades[i].habitantes, |ciudades| - i - 1 < v_{0})\\
+		\overset{\text{AX1}}{\equiv} def(res + ciudades[i].habitantes) \yLuego |ciudades| - i - 1 < v_{0}\\
+		\equiv 0 \le i < |ciudades| \yLuego |ciudades| - i - 1 < v_{0}$
+		\vspace{0.3cm}\\
+		Finalmente, veamos que $\{I \land B \land v_{0} = f_{v}\} \implies wp(S, f_{v} < v_{0})\\
+		(0 \le i \le |ciudades| \land \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes} \land i < |ciudades| \land v_{0} = |ciudades| - i) \implies wp(S, f_{v} < v_{0})\\
+		(0 \le i < |ciudades| \land v_{0} = |ciudades| - i) \implies (0 \le i < |ciudades| \yLuego |ciudades| - i - 1 < v_{0})$
+		\begin{itemize}
+			\item $0 \le i < |ciudades| \implies 0 \le i < |ciudades| \ \checkmark$
+			\item $v_{0} = |ciudades| - i \implies |ciudades| - i - 1 < |ciudades| - i \iff - 1 < 0 \ \checkmark$
+		\end{itemize}
+		\item $I \land f_{v} \le 0 \implies \neg B\\
+		(0 \le i \le |ciudades| \land \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes} \land |ciudades| - i \le 0) \implies i \ge |ciudades|\\
+		(0 \le i \le |ciudades| \land |ciudades| \le i) \implies i \ge |ciudades|\\
+		|ciudades| \le i \le |ciudades| \implies i \ge |ciudades|\\
+		i = |ciudades| \implies i \ge |ciudades| \ \checkmark$
+	\end{enumerate}
+	Aclaraci\'on: En estos dos \'ultimos \'items se ignora el valor de res en el momento de demostrar la implicaci\'on final porque no es relevante
+	para la validez de esta. Los dos casos fueron \underline{subrayados}.
+	
+\subsection{Ejercicio 2}
+En el requiere se incluye la condici\'on
+	\begin{equation}
+		\existe[unalinea]{i}{\ent}{0 \le i < |ciudades| \yLuego ciudades[i].habitantes > 50.000}
+	\end{equation}
+	Ya que vimos que el programa funciona con respecto a su especificaci\'on, entonces este n\'umero mayor a 50.000 ser\'a sumado. 
+	La \'unica forma de que la sumatoria total no sea mayor a 50.000 ser\'ia si existiera alg\'un numero negativo entre los que se suman.
+	Sabemos que esto no sucede gracias a otro de los requiere: 
+	\begin{equation}
+		\paraTodo[unalinea]{i}{\ent}{0 \le i < |ciudades| \implicaLuego ciudades[i].habitantes \ge 0}
+	\end{equation}
+Por lo tanto, el progama siempre devuelve un n\'umero mayor a 50.000.
 
 \vspace{4cm}
+	ACÁ TERMINA EL TP IGNOREN LO QUE SIGUE, LO DEJE POR SI ME SIRVE DESPUES PARA HACER ALGO MÁS 
+	
+	\vspace{4cm}
 
 Lo principal: las fórmulas. Se puede poner en una linea, como $x_i = x_{i-1} + x_{i-2}$, o ponerse más grande:
 
