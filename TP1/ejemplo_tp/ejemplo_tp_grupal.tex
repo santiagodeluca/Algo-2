@@ -48,23 +48,25 @@
 	noHayNombresRepetidos(menoresDeCiudades) \land habitantesNoNegativos(menoresDeCiudades)}
 	\requiere{|menoresDeCiudades| = |mayoresDeCiudades| \yLuego \\ mismosNombres(menoresDeCiudades, mayoresDeCiudades)}
 	\asegura{|res| = |menoresDeCiudades| \yLuego (mismosNombres(res, menoresDeCiudades) \land \\ habitantesSumados(res, menoresDeCiudades, mayoresDeCiudades))}
+	
+	\vspace{0.3cm}
+
+	\pred{mismosNombres}{listaDeCiudades1 : \TLista{Ciudad}, listaDeCiudades2 : \TLista{Ciudad}}
+	{\paraTodo[unalinea]{i}{\ent}{0 \le i < |listaDeCiudades1| \implicaLuego \\
+	\existe[unalinea]{j}{\ent}{0 \le j < |listaDeCiudades2| \yLuego listaDeCiudades1[i].nombre = listaDeCiudades2[j].nombre}}}
+	
+	\pred{habitantesSumados}{listaSuma : \TLista{Ciudad}, listaMenores : \TLista{Ciudad}, listaMayores : \TLista{Ciudad}}
+	{\paraTodo[unalinea]{i}{\ent}{0 \le i < |listaSuma| \implicaLuego
+	\existe[unalinea]{j, k}{\ent}{0 \le j, k < |listaMenores| \yLuego \\ 
+	(ciudadSuma[i].nombre = ciudadMenor[j].nombre \land ciudadSuma[i].nombre = ciudadMayor[k].nombre \land \\
+	ciudadSuma[i].habitantes = ciudadMenor[j].habitantes + ciudadMayor[k].habitantes)}}}
 \end{proc}
-
-\pred{mismosNombres}{listaDeCiudades1 : \TLista{Ciudad}, listaDeCiudades2 : \TLista{Ciudad}}
-{\paraTodo[unalinea]{i}{\ent}{0 \le i < |listaDeCiudades1| \implicaLuego \\
- \existe[unalinea]{j}{\ent}{0 \le j < |listaDeCiudades2| \yLuego listaDeCiudades1[i].nombre = listaDeCiudades2[j].nombre}}}
-
-\pred{habitantesSumados}{listaSuma : \TLista{Ciudad}, listaMenores : \TLista{Ciudad}, listaMayores : \TLista{Ciudad}}
-{\paraTodo[unalinea]{i}{\ent}{0 \le i < |listaSuma| \implicaLuego
- \existe[unalinea]{j, k}{\ent}{0 \le j, k < |listaMenores| \yLuego \\ 
- (ciudadSuma[i].nombre = ciudadMenor[j].nombre \land ciudadSuma[i].nombre = ciudadMenor[k].nombre \land \\
- ciudadSuma[i].habitantes = ciudadMenor[j].habitantes + ciudadMayor[k].habitantes)}}}
-
+	
 \subsection{Ejercicio 3}
 
 \begin{proc}{hayCamino}{\In distancias : \TLista{\TLista{\ent}}, \In desde : \ent, \In hasta : \ent}{\bool}
-	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land \\ diagonalEsCero(distancias) \land \\ valoresNoNegativos(distancias))}
-	\asegura{res = True \iff \existe[unalinea]{camino}{\TLista{\ent}}{|camino| \geq 2 \land esCamino(distancias, desde, hasta, camino)}}
+	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land diagonalEsCero(distancias) \land valoresNoNegativos(distancias))}
+	\asegura{res = True \iff \existe[unalinea]{camino}{\TLista{\ent}}{esCamino(distancias, desde, hasta, camino)}}
 \end{proc}
 
 \pred{esCuadrada}{matriz : \TLista{\TLista{\ent}}}
@@ -81,29 +83,29 @@
 
 \pred{esCamino}{distancias : \TLista{\TLista{\ent}}, desde : \ent, hasta : \ent, camino : \TLista{\ent}}
 {ciudadesValidas(camino, |distancia|) \yLuego \\
-(paresConectados(distancias, camino) \land \\
-camino[0] = desde \land\\
+(|camino| \geq 2 \land ciudadesConectadas(distancias, camino) \land \\
+camino[0] = desde \land
 camino[|camino| - 1] = hasta)} 
-
-\pred{paresConectados}{distancias : \TLista{\TLista{\ent}}, camino : \TLista{\ent}}
-{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| - 1 \implicaLuego distancias[camino[i]][camino[i + 1]] > 0}}
 
 \pred{ciudadesValidas}{camino : \TLista{\ent}, numeroDeCiudades : \ent}
 {\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| \implicaLuego camino[i] < numeroDeCiudades}}
 
+\pred{ciudadesConectadas}{distancias : \TLista{\TLista{\ent}}, camino : \TLista{\ent}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| - 1 \implicaLuego distancias[camino[i]][camino[i + 1]] > 0}}
 
 \subsection{Ejercicio 4}
 
-Para este ejercicio usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con P una matriz y 
-D una matriz diagonal, es decir, que todos sus valores son cero menos los de su diagonal, se cumple que la diagonal
-de D tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$. \\
+Para este procedimiento usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con $P$ una matriz,
+$P^{-1}$ inversa de $P$ y $D$ una matriz diagonal, es decir, que todos sus valores son cero menos los de su diagonal, se cumple que la diagonal
+de $D$ tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$.
+
 Notar que no todas las matrices son diagonalizables, pero sí lo son aquellas que son cuadradas y simétricas,
 es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este programa lo son (por consigna y por requiere).
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
 	\requiere{conexi\acute{o}n = C_{0}}
 	\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
-	\asegura{\existe[]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{(|C_{0}| = |P| \land
+	\asegura{\existe[unalinea]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{\\(|C_{0}| = |P| \land
 	|C_{0}| = |PInversa| \land |C_{0}| = |diagonal| \land |C_{0}| = |diagonalElevada| \land \\
 	esCuadrada(P) \land esCuadrada(PInversa) \land esCuadrada(diagonal) \land esCuadrada(diagonalElevada)) \yLuego \\
 	esInversa(P, PInversa) \land \\
@@ -112,45 +114,50 @@ es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este
 	esDiagonalElevada(diagonal, diagonalElevada, n) \land \\
 	esProductoTripleDeMatrices(P, diagonal, PInversa, C_{0}) \land \\
 	esProductoTripleDeMatrices(P, diagonalElevada, PInversa, conexi\acute{o}n)}}
+	
+	\vspace{0.3cm}
+	
+	\pred{todosCerosOUnos}{matriz : \TLista{\TLista{\ent}}}
+	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego (matriz[i][j] = 0 \lor matriz[i][j] = 1)}}
+	
+	\vspace{0.3cm}
+	
+	Para el siguiente predicado usaremos que $A*A^{-1} = I$ donde $I$ es la matriz identidad.
+	
+	\pred{esInversa}{matrizOriginal : \TLista{\TLista{\ent}}, matrizInversa : \TLista{\TLista{\ent}}}
+	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizOriginal| \implicaLuego \\ 
+	((i = j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 1) \lor \\
+	(i \neq j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 0))}}
+
+	\pred{esDiagonal}{matriz : \TLista{\TLista{\ent}}}
+	{\paraTodo[unalinea]{i, j}{\ent}{(0 \leq i, j < |matriz| \land i \neq j) \implicaLuego matriz[i][j] = 0}}
+
+	\vspace{0.3cm}
+	Para el siguiente predicado usaremos que elevar una matriz diagonal a la $n$ es lo mismo que elevar cada n\'umero 
+	de la diagonal a la $n$. Aqu\'i es donde el problema deja de tratarse de elevar matrices a la $n$, y pasa a 
+	tratarse de elevar n\'umeros a $n$, algo que podemos hacer con facilidad.
+
+	\pred{esDiagonalElevada}{matrizDiagonal : \TLista{\TLista{\ent}}, matrizDiagonalElevada : \TLista{\TLista{\ent}}, n : \ent}
+	{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matrizDiagonal| \implicaLuego matrizDiagonalElevada[i][i] = (matrizDiagonal[i][i])^{n}}}
+
+	\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
+	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
+	(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
+
+	\pred{esProductoTripleDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizFactor3 : \TLista{\TLista{\ent}},
+	matrizProducto : \TLista{\TLista{\ent}}}
+	{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
+	(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
+	esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
 \end{proc}
-
-\vspace{0.3cm}
-
-\pred{todosCerosOUnos}{matriz : \TLista{\TLista{\ent}}}
-{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego (matriz[i][j] = 0 \lor matriz[i][j] = 1)}}
-
-\vspace{0.3cm}
-
-Para el siguiente predicado usaremos que $A*A^{-1} = I$ donde $I$ es la matriz identidad.
-
-\pred{esInversa}{matrizOriginal : \TLista{\TLista{\ent}}, matrizInversa : \TLista{\TLista{\ent}}}
-{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizOriginal| \implicaLuego \\ 
-((i = j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 1) \lor \\
-(i \neq j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 0))}}
-
-\pred{esDiagonal}{matriz : \TLista{\TLista{\ent}}}
-{\paraTodo[unalinea]{i, j}{\ent}{(0 \leq i, j < |matriz| \land i \neq j) \implicaLuego matriz[i][j] = 0}}
-
-\pred{esDiagonalElevada}{matrizDiagonal : \TLista{\TLista{\ent}}, matrizDiagonalElevada : \TLista{\TLista{\ent}}, n : \ent}
-{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matrizDiagonal| \implicaLuego matrizDiagonalElevada[i][i] = (matrizDiagonal[i][i])^{n}}}
-
-\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
-{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
-(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
-
-\pred{esProductoTripleDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizFactor3 : \TLista{\TLista{\ent}},
-matrizProducto : \TLista{\TLista{\ent}}}
-{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
-(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
-esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
 
 \subsection{Ejercicio 5}
 
 \begin{proc}{caminoM\'inimo}{\In origen : \ent, \In destino : \ent, \In distancias : \TLista{\TLista{\ent}}}{\TLista{\ent}}
-	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land \\ diagonalEsCero(distancias) \land \\ valoresNoNegativos(distancias))}
+	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land diagonalEsCero(distancias) \land valoresNoNegativos(distancias))}
 	\asegura{esCamino(distancias, origen, destino, res) \implicaLuego \\
-	(\paraTodo[unalinea]{camino}{\TLista{\ent}}{esCamino(distancias, origen, destino, camino) \implicaLuego \\
-	distanciaRecorrida (camino, distancias) \ge distanciaRecorrida (res, distancias)})}
+	(\paraTodo[unalinea]{otroCamino}{\TLista{\ent}}{esCamino(distancias, origen, destino, otroCamino) \implicaLuego \\
+	distanciaRecorrida (otroCamino, distancias) \ge distanciaRecorrida (res, distancias)})}
 	\asegura{\neg esCamino(distancias, origen, destino, res) \implicaLuego res = \textlangle \textrangle}
 	
 	\vspace{0.3cm}
@@ -177,12 +184,12 @@ $S \equiv S1; S2$
 
 Proponemos el siguiente invariante: \\
 \begin{equation}
-	I \equiv \{0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes\}
+	I \equiv \{0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes\}
 \end{equation}
 
 \begin{enumerate} \setlength\itemsep{0cm}
 	\item $P_{c} \implies I$\\
-	$(i = 0 \land res = 0) \implies (0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$
+	$(i = 0 \land res = 0) \implies (0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$
 	\begin{itemize}
 		\item $i = 0 \implies 0 \le 0 \le |ciudades| \ \checkmark$ 
 		\item $i = 0 \implies res = \sum\nolimits_{j=0}^{- 1} ciudades[j].habitantes \implies res = 0 \ \checkmark$
@@ -192,26 +199,26 @@ Proponemos el siguiente invariante: \\
 	Buscamos $wp(S, I) \equiv\\ 
 	\equiv wp(S1;S2, I) \\
 	\overset{\text{AX3}}{\equiv} wp(S1, wp(S2, I))\\
-	\equiv wp(S1, wp(i := i + 1, 0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes))\\
-	\overset{\text{AX1}}{\equiv} wp(S1, def(i + 1) \yLuego (0 \le i + 1 \le |ciudades| \land res = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes))\\
-	\equiv wp(res := res + ciudades[i].habitantes, 0 \le i + 1 \le |ciudades| \land res = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes)\\
-	\overset{\text{AX1}}{\equiv} def(ciudades[i].habitantes) \yLuego (0 \le i + 1 \le |ciudades| \land res + ciudades[i].habitantes = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes)\\
-	\equiv 0 \le i < |ciudades| \yLuego (-1 \le i < |ciudades| \land res + ciudades[i].habitantes = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes)\\
+	\equiv wp(S1, wp(i := i + 1, 0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes))\\
+	\overset{\text{AX1}}{\equiv} wp(S1, def(i + 1) \yLuego 0 \le i + 1 \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes)\\
+	\equiv wp(res := res + ciudades[i].habitantes, 0 \le i + 1 \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes)\\
+	\overset{\text{AX1}}{\equiv} def(ciudades[i].habitantes) \yLuego 0 \le i + 1 \le |ciudades| \yLuego res + ciudades[i].habitantes = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes\\
+	\equiv 0 \le i < |ciudades| \yLuego -1 \le i < |ciudades| \yLuego res + ciudades[i].habitantes = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes\\
 	\equiv 0 \le i < |ciudades| \yLuego res  = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes + ciudades[i].habitantes - ciudades[i].habitantes\\
 	\equiv 0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes$
 	\vspace{0.3cm}\\
 	Finalmente, veamos que $\{I \land B\} \implies wp(S,I)$\\
-	$(0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes \land i < |ciudades|) \implies wp(S,I)$\\
-	$(0 \le i < |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes) \implies (0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$\\
+	$((0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes) \land i < |ciudades|) \implies wp(S,I)$\\
+	$(0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes) \implies (0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$\\
 	El predecente y el consecuente de esta implicacai\'on son id\'enticos, por lo tanto es una tautolog\'ia. \checkmark
 	\item $I \land \neg B \implies Q_{c}\\
-	(0 \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes \land i \ge |ciudades|) \implies Q_{c}\\
-	(|ciudades| \le i \le |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes|) \implies Q_{c}\\
-	(i = |ciudades| \land res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes|) \implies Q_{c}\\
+	((0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes) \land i \ge |ciudades|) \implies Q_{c}\\
+	(|ciudades| \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes|) \implies Q_{c}\\
+	(i = |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes|) \implies Q_{c}\\
 	res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \implies res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\\$
 	De nuevo, el predecente y el consecuente de esta implicacai\'on son id\'enticos, por lo tanto es una tautolog\'ia. \checkmark
 \end{enumerate}
-Queda demostrado parcialmente el progama. Para demostrar que este es v\'alido utilizaremos el teorema de terminaci\'on. 
+Queda demostrado parcialmente el progama. Para demostrar que el ciclo termina y el programa es v\'alido utilizaremos el teorema de terminaci\'on. 
 Proponemos la siguiente funci\'on variante:\\
 \begin{equation}
 		f_{v} = |ciudades| - i
@@ -230,19 +237,19 @@ Proponemos la siguiente funci\'on variante:\\
 		\equiv 0 \le i < |ciudades| \yLuego |ciudades| - i - 1 < v_{0}$
 		\vspace{0.3cm}\\
 		Finalmente, veamos que $\{I \land B \land v_{0} = f_{v}\} \implies wp(S, f_{v} < v_{0})\\
-		(0 \le i \le |ciudades| \land \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes} \land i < |ciudades| \land v_{0} = |ciudades| - i) \implies wp(S, f_{v} < v_{0})\\
+		((0 \le i \le |ciudades| \yLuego \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes}) \land i < |ciudades| \land v_{0} = |ciudades| - i) \implies wp(S, f_{v} < v_{0})\\
 		(0 \le i < |ciudades| \land v_{0} = |ciudades| - i) \implies (0 \le i < |ciudades| \yLuego |ciudades| - i - 1 < v_{0})$
 		\begin{itemize}
 			\item $0 \le i < |ciudades| \implies 0 \le i < |ciudades| \ \checkmark$
 			\item $v_{0} = |ciudades| - i \implies |ciudades| - i - 1 < |ciudades| - i \iff - 1 < 0 \ \checkmark$
 		\end{itemize}
 		\item $I \land f_{v} \le 0 \implies \neg B\\
-		(0 \le i \le |ciudades| \land \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes} \land |ciudades| - i \le 0) \implies i \ge |ciudades|\\
+		((0 \le i \le |ciudades| \yLuego \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes}) \land |ciudades| - i \le 0) \implies i \ge |ciudades|\\
 		(0 \le i \le |ciudades| \land |ciudades| \le i) \implies i \ge |ciudades|\\
 		|ciudades| \le i \le |ciudades| \implies i \ge |ciudades|\\
 		i = |ciudades| \implies i \ge |ciudades| \ \checkmark$
 	\end{enumerate}
-	Aclaraci\'on: En estos dos \'ultimos \'items se ignora el valor de res en el momento de demostrar la implicaci\'on final porque no es relevante
+	Aclaraci\'on: En estos dos \'ultimos \'items se ignora el valor de res al momento de demostrar la implicaci\'on final porque no es relevante
 	para la validez de esta. Los dos casos fueron \underline{subrayados}.
 	
 \subsection{Ejercicio 2}
@@ -250,12 +257,14 @@ En el requiere se incluye la condici\'on
 	\begin{equation}
 		\existe[unalinea]{i}{\ent}{0 \le i < |ciudades| \yLuego ciudades[i].habitantes > 50.000}
 	\end{equation}
+
 	Ya que vimos que el programa funciona con respecto a su especificaci\'on, entonces este n\'umero mayor a 50.000 ser\'a sumado. 
-	La \'unica forma de que la sumatoria total no sea mayor a 50.000 ser\'ia si existiera alg\'un numero negativo entre los que se suman.
-	Sabemos que esto no sucede gracias a otro de los requiere: 
+	La \'unica forma de que la sumatoria total no sea mayor a 50.000 ser\'ia si existiera alg\'un n\'umero negativo entre los que se suman.
+	Sabemos que esto no sucede gracias a otra condici\'on del requiere: 
 	\begin{equation}
 		\paraTodo[unalinea]{i}{\ent}{0 \le i < |ciudades| \implicaLuego ciudades[i].habitantes \ge 0}
 	\end{equation}
+
 Por lo tanto, el progama siempre devuelve un n\'umero mayor a 50.000.
 
 \vspace{4cm}
