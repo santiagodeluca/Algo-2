@@ -82,7 +82,7 @@
 {\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego matriz[i][j] \ge 0}}
 
 \pred{esCamino}{distancias : \TLista{\TLista{\ent}}, desde : \ent, hasta : \ent, camino : \TLista{\ent}}
-{ciudadesValidas(camino, |distancia|) \yLuego \\
+{ciudadesValidas(camino, |distancias|) \yLuego \\
 (|camino| \geq 2 \land ciudadesConectadas(distancias, camino) \land \\
 camino[0] = desde \land
 camino[|camino| - 1] = hasta)} 
@@ -128,28 +128,55 @@ es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este
 	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizOriginal| \implicaLuego \\ 
 	((i = j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 1) \lor \\
 	(i \neq j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 0))}}
-
+	
 	\pred{esDiagonal}{matriz : \TLista{\TLista{\ent}}}
 	{\paraTodo[unalinea]{i, j}{\ent}{(0 \leq i, j < |matriz| \land i \neq j) \implicaLuego matriz[i][j] = 0}}
-
+	
 	\vspace{0.3cm}
 	Para el siguiente predicado usaremos que elevar una matriz diagonal a la $n$ es lo mismo que elevar cada n\'umero 
 	de la diagonal a la $n$. Aqu\'i es donde el problema deja de tratarse de elevar matrices a la $n$, y pasa a 
 	tratarse de elevar n\'umeros a $n$, algo que podemos hacer con facilidad.
-
+	
 	\pred{esDiagonalElevada}{matrizDiagonal : \TLista{\TLista{\ent}}, matrizDiagonalElevada : \TLista{\TLista{\ent}}, n : \ent}
 	{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matrizDiagonal| \implicaLuego matrizDiagonalElevada[i][i] = (matrizDiagonal[i][i])^{n}}}
-
+	
 	\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
 	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
 	(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
-
+	
 	\pred{esProductoTripleDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizFactor3 : \TLista{\TLista{\ent}},
 	matrizProducto : \TLista{\TLista{\ent}}}
 	{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
 	(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
 	esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
 \end{proc}
+
+\pagebreak
+
+SOLUCION ALTERNATIVA AL EJERCICIO 4
+\begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
+	\requiere{conexi\acute{o}n = C_{0}}
+	\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
+	\asegura{\existe[unalinea]{secuenciaDeMatrices}{\TLista{\TLista{\TLista{\ent}}}}{|secuenciaDeMatrices| = n - 1 \yLuego\\
+	(secuenciaDeMatrices[0] = C_{0} \land \\
+	esSecuenciaDePotencias(secuenciaDeMatrices) \land \\
+	conexi\acute{o}n = secuenciaDeMatrices[n - 1])}}
+	
+	\vspace{0.3cm}
+	\pred{todosCerosOUnos}{matriz : \TLista{\TLista{\ent}}}
+	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego (matriz[i][j] = 0 \lor matriz[i][j] = 1)}}
+	
+	\pred{esSecuenciaDePotencias}{secuenciaDeMatrices : \TLista{\TLista{\TLista{\ent}}}}
+	{\paraTodo[unalinea]{i}{\ent}{1 \le i < |secuenciaDeMatrices| \implicaLuego \\
+	esProductoDeMatrices(secuenciaDeMatrices[i - 1], secuenciaDeMatrices[0], secuenciaDeMatrices[i])}}
+	
+	\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
+	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
+	(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
+	
+\end{proc}
+
+
 
 \subsection{Ejercicio 5}
 
@@ -172,7 +199,10 @@ es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este
 Para demostrar la correctitud de la implementaci\'on con respecto a la especificaci\'on utilizaremos
 el teorema del invariante y el teorema de terminaci\'on. Con respecto a nuestro programa, llamamos:
 \vspace{0.3cm}\\
-$P_{c} \equiv \{i = 0 \land res = 0\}$\\
+$P_{c} \equiv \{\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
+\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
+\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \land
+i = 0 \land res = 0\}$\\
 $Q_{c} \equiv \{res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\}$\\
 $B \equiv \{i < |ciudades|\}$\\
 $\neg B \equiv \{i \ge |ciudades|\}$\\
@@ -192,8 +222,11 @@ Proponemos el siguiente invariante: \\
 	$(i = 0 \land res = 0) \implies (0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$
 	\begin{itemize}
 		\item $i = 0 \implies 0 \le 0 \le |ciudades| \ \checkmark$ 
-		\item $i = 0 \implies res = \sum\nolimits_{j=0}^{- 1} ciudades[j].habitantes \implies res = 0 \ \checkmark$
+		\item $(i = 0 \land res = 0) \implies 0 = \sum\nolimits_{j=0}^{- 1} ciudades[j].habitantes \ \checkmark$
 	\end{itemize}
+	Aclaraci\'on: para la demostraci\'on de esta implicaci\'on no utilizamos el existencial y los universales que
+	hab\'ian quedado en $P_{c}$ por la precondici\'on del programa porque no son necesarios para la validez de esta.
+	Basta con utilizar $i = 0 \land res = 0$.
 	\item $\{I \land B\}S\{I\} \iff \{I \land B\} \implies wp(S,I)$
 	\vspace{0.3cm}\\
 	Buscamos $wp(S, I) \equiv\\ 
