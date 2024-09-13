@@ -32,7 +32,7 @@
 
 \begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad}}{\TLista{Ciudad}}
 	\requiere{noHayNombresRepetidos(ciudades) \land habitantesNoNegativos(ciudades)}
-	\asegura{C \in res \iff (C \in ciudades \land C.habitantes > 50.000)}
+	\asegura{C \in res \iff (C \in ciudades \yLuego C.habitantes > 50.000)}
 \end{proc}
 
 \pred{noHayNombresRepetidos}{listaDeCiudades : \TLista{Ciudad}}
@@ -44,8 +44,8 @@
 \subsection{Ejercicio 2}
 
 \begin{proc}{sumaDeHabitantes}{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{\TLista{Ciudad}}
-	\requiere{noHayNombresRepetidos(mayoresDeCiudades) \land habitantesNoNegativos(mayoresDeCiudades) \land \\
-	noHayNombresRepetidos(menoresDeCiudades) \land habitantesNoNegativos(menoresDeCiudades)}
+	\requiere{noHayNombresRepetidos(menoresDeCiudades) \land noHayNombresRepetidos(mayoresDeCiudades)}
+	\requiere{habitantesNoNegativos(menoresDeCiudades \land habitantesNoNegativos(mayoresDeCiudades))}
 	\requiere{|menoresDeCiudades| = |mayoresDeCiudades| \yLuego \\ mismosNombres(menoresDeCiudades, mayoresDeCiudades)}
 	\asegura{|res| = |menoresDeCiudades| \yLuego (mismosNombres(res, menoresDeCiudades) \land \\ habitantesSumados(res, menoresDeCiudades, mayoresDeCiudades))}
 	
@@ -57,8 +57,8 @@
 	
 	\pred{habitantesSumados}{listaSuma : \TLista{Ciudad}, listaMenores : \TLista{Ciudad}, listaMayores : \TLista{Ciudad}}
 	{\paraTodo[unalinea]{i}{\ent}{0 \le i < |listaSuma| \implicaLuego
-	\existe[unalinea]{j, k}{\ent}{0 \le j, k < |listaMenores| \yLuego \\ 
-	(listaSuma[i].nombre = listaMenor[j].nombre \land listaSuma[i].nombre = listaMayor[k].nombre \land \\
+	\existe[unalinea]{j, k}{\ent}{0 \le j, k < |listaMenores| \yLuego (\\ 
+	listaSuma[i].nombre = listaMenor[j].nombre \land \\ listaSuma[i].nombre = listaMayor[k].nombre \land \\
 	listaSuma[i].habitantes = listaMenor[j].habitantes + listaMayor[k].habitantes)}}}
 \end{proc}
 	
@@ -83,82 +83,18 @@
 {\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego matriz[i][j] \ge 0}}
 
 \pred{esCamino}{distancias : \TLista{\TLista{\ent}}, desde : \ent, hasta : \ent, camino : \TLista{\ent}}
-{|camino| \geq 2 \yLuego (ciudadesConectadas(distancias, camino) \land 
+{|camino| \geq 2 \yLuego ciudadesValidas(distancias, camino) \yLuego (ciudadesConectadas(distancias, camino) \land \\
 camino[0] = desde \land
 camino[|camino| - 1] = hasta)} 
 
 \pred{ciudadesConectadas}{distancias : \TLista{\TLista{\ent}}, camino : \TLista{\ent}}
-{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| \implicaLuego 0 \le camino[i] < |distancias|} \yLuego \\ 
-\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| - 1  \implicaLuego distancias[camino[i]][camino[i + 1]] > 0}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| - 1  \implicaLuego distancias[camino[i]][camino[i + 1]] > 0}}
+
+\pred{ciudadesValidas}{distancias : \TLista{\TLista{\ent}}, camino : \TLista{\ent}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| \implicaLuego 0 \le camino[i] < |distancias|}}
 
 \subsection{Ejercicio 4}
 
-Para este procedimiento usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con $P$ una matriz,
-$P^{-1}$ inversa de $P$ y $D$ una matriz diagonal, es decir, que todos sus valores son cero menos los de su diagonal, se cumple que la diagonal
-de $D$ tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$.
-
-Notar que no todas las matrices son diagonalizables, pero sí lo son aquellas que son cuadradas y simétricas,
-es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este procedimiento lo son (por consigna y por requiere).
-
-\begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
-	\requiere{n \ge 1}
-	\requiere{|conexi\acute{o}n| > 0}
-	\requiere{conexi\acute{o}n = C_{0}}
-	\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
-	\asegura{\existe[unalinea]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{\\(|C_{0}| = |P| \land
-	|C_{0}| = |PInversa| \land |C_{0}| = |diagonal| \land |C_{0}| = |diagonalElevada| \land \\
-	esCuadrada(P) \land esCuadrada(PInversa) \land esCuadrada(diagonal) \land esCuadrada(diagonalElevada)) \yLuego \\
-	esInversa(P, PInversa) \land \\
-	esDiagonal(diagonal) \land \\
-	esDiagonal(diagonalElevada) \land \\
-	esDiagonalElevada(diagonal, diagonalElevada, n) \land \\
-	esProductoTripleDeMatrices(P, diagonal, PInversa, C_{0}) \land \\
-	esProductoTripleDeMatrices(P, diagonalElevada, PInversa, conexi\acute{o}n)}}
-	
-	\vspace{0.3cm}
-	
-	\pred{todosCerosOUnos}{matriz : \TLista{\TLista{\ent}}}
-	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego (matriz[i][j] = 0 \lor matriz[i][j] = 1)}}
-	
-	\vspace{0.3cm}
-	
-	Para el siguiente predicado usaremos que $A*A^{-1} = I$ donde $I$ es la matriz identidad.
-	
-	\pred{esInversa}{matrizOriginal : \TLista{\TLista{\ent}}, matrizInversa : \TLista{\TLista{\ent}}}
-	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizOriginal| \implicaLuego \\ 
-	((i = j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 1) \lor \\
-	(i \neq j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 0))}}
-	
-	\pred{esDiagonal}{matriz : \TLista{\TLista{\ent}}}
-	{\paraTodo[unalinea]{i, j}{\ent}{(0 \leq i, j < |matriz| \land i \neq j) \implicaLuego matriz[i][j] = 0}}
-	
-	\vspace{0.3cm}
-	Para el siguiente predicado usaremos que elevar una matriz diagonal a la $n$ es lo mismo que elevar cada n\'umero 
-	de la diagonal a la $n$. Aqu\'i es donde el problema deja de tratarse de elevar matrices a la $n$, y pasa a 
-	tratarse de elevar n\'umeros a $n$, algo que podemos hacer con facilidad.
-	
-	\pred{esDiagonalElevada}{matrizDiagonal : \TLista{\TLista{\ent}}, matrizDiagonalElevada : \TLista{\TLista{\ent}}, n : \ent}
-	{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matrizDiagonal| \implicaLuego matrizDiagonalElevada[i][i] = (matrizDiagonal[i][i])^{n}}}
-	
-	\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
-	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
-	(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
-	
-	\pred{esProductoTripleDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizFactor3 : \TLista{\TLista{\ent}},
-	matrizProducto : \TLista{\TLista{\ent}}}
-	{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
-	(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
-	esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
-	
-	\vspace{0.3cm}
-	Aclaraci\'on: todos estos predicados est\'an diseñados sabiendo que todas las matrices que recibirán serán cuadradas y del mismo tamaño.
-	Nos aseguramos de que esto suceda en la primera parte del asegura, y luego la separamos del llamado a estos predicados con un y-luego. De esta forma, estamos seguros de que 
-	estos predicados nunca reciben matrices que los puedan indefinir.
-\end{proc}
-
-\pagebreak
-
-SOLUCION ALTERNATIVA AL EJERCICIO 4
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
 	\requiere{n \ge 1}
 	\requiere{|conexi\acute{o}n| > 0}
@@ -185,8 +121,6 @@ SOLUCION ALTERNATIVA AL EJERCICIO 4
 	
 \end{proc}
 
-
-
 \subsection{Ejercicio 5}
 
 \begin{proc}{caminoM\'inimo}{\In origen : \ent, \In destino : \ent, \In distancias : \TLista{\TLista{\ent}}}{\TLista{\ent}}
@@ -198,7 +132,7 @@ SOLUCION ALTERNATIVA AL EJERCICIO 4
 	(\neg esCamino(distancias, origen, destino, res) \land res = \textlangle \textrangle)}
 	
 	\vspace{0.3cm}
-
+	
 	\aux{distanciaRecorrida}{camino : \TLista{\ent}, distancias : \TLista{\TLista{\ent}}}{\ent} 
 	{\\ \sum\nolimits_{i=0}^{|camino| - 2} (distancias[camino[i]][camino[i + 1]])}
 	
@@ -210,13 +144,11 @@ Para demostrar la correctitud de la implementaci\'on con respecto a la especific
 la monoton\'ia sobre el programa que est\'a compuesto por dos sentencias y un ciclo.
 Con respecto a nuestro programa, llamamos:
 \vspace{0.3cm}\\
+
 $P \equiv \{\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
 \paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
 \paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \}$\\
-$P_{c} \equiv \{\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
-\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
-\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \land\\
-i = 0 \land res = 0\}$\\
+$P_{c} \equiv \{P \land i = 0 \land res = 0\}$\\
 $Q_{c} \equiv Q \equiv \{res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\}$\\
 $T1 \equiv res := 0$\\
 $T2 \equiv i := 0$\\
@@ -239,17 +171,8 @@ Buscamos $wp(T, P_{c}) \equiv\\
 \equiv wp(T1;T2, P_{c})\\
 \overset{\text{AX3}}{\equiv} wp(T1, wp(T2, P_{c}))\\
 \equiv wp(res := 0, wp(i := 0, P_{c}))\\
-\overset{\text{AX1}}{\equiv} wp(res := 0, def(0) \yLuego (\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
-\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
-\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \land\\
-0 = 0 \land res = 0))\\
-\overset{\text{AX1}}{\equiv} def(0) \yLuego (\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
-\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
-\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \land\\
-0 = 0)\\
-\equiv \existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
-\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
-\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre}\\
+\overset{\text{AX1}}{\equiv} wp(res := 0, def(0) \yLuego (P \land 0 = 0 \land res = 0))\\
+\overset{\text{AX1}}{\equiv} def(0) \yLuego (P \land 0 = 0)\\
 \equiv P$\\
 
 Finalmente, $P \implies P \equiv True \ \checkmark$\\
@@ -334,25 +257,123 @@ Proponemos la siguiente funci\'on variante:\\
 	para la validez de esta. Los dos casos fueron \underline{subrayados}.\\
 
 	Finalmente, por el teorema del invariante y el teorema de terminaci\'on, se demostr\'o que $P_{c} \implies wp(while..., Q)$.\\
-
+	
 	Por monoton\'ia, la tripla de Hoare $\{P\}T;while...\{Q\}$ es v\'alida.
-
+	
 	Luego, podemos afirmar que la implementaci\'on del programa es correcta respecto de su especificaci\'on.
 	
-\subsection{Ejercicio 2}
-En el requiere se incluye la condici\'on
+	\subsection{Ejercicio 2}
+Para demostrar que la sumatoria es mayor a 50.000 se podría modificar el invariante y la $Q_{c}$ de la siguiente manera: 
+\begin{equation}
+	I \equiv \{0 \le i \le |ciudades| \yLuego (res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes \land P)\}
+\end{equation}
+\begin{equation}
+	Q_{c} \equiv  \{res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \land res > 50.000\}\\
+\end{equation}
+
+Y luego demostrar la correctitud de vuelta.
+
+Pero notando que $ciudades$ es un parámetro $in$ podemos asegurar que $ciudades$ no cambia a lo largo del programa y por lo tanto, 
+sabemos que sigue cumpliendo $P$ al final de este. Entonces, utilizando esta propiedad de los parámetros $in$ no es necesario 
+demostrar la correctitud completa de nuevo, los cinco puntos valdrán porque:
+\begin{itemize}
+	\item $P_{c} \implies I$: Sigue valiendo porque solo se agregan a $I$ condiciones que ya estaban en $P_{c}$.
+	\item $\{I \land B\}S\{I\}$: Sigue valiendo que el invariante no cambia luego de una iteración del ciclo porque solo se agregan condiciones sobre $ciudades$, que al ser $in$ 
+	no es modificado por $S$ (no varía, es invariante).
+	\item $I \land \neg B \implies Q_{c}\\
+	((0 \le i \le |ciudades| \yLuego (res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes \land P)) \land i \ge |ciudades|) \implies Q_{c}\\
+	(|ciudades| \le i \le |ciudades| \yLuego (res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes| \land P)) \implies Q_{c}\\
+	(i = |ciudades| \yLuego (res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes| \land P)) \implies Q_{c}\\
+	res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \land P \implies res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \land res > 50.000\\$
+	Sabemos que $res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \implies res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \equiv True$ \\
+	Y sabiendo que se cumple $P$, podemos hacer la siguiente deducción sobre $res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes$. \\
+	En $P$ se incluye la condici\'on
 	\begin{equation}
 		\existe[unalinea]{i}{\ent}{0 \le i < |ciudades| \yLuego ciudades[i].habitantes > 50.000}
 	\end{equation}
-
-	Ya que vimos que el programa funciona con respecto a su especificaci\'on, entonces este n\'umero mayor a 50.000 ser\'a sumado. 
+	
+	Entonces, si sumamos todos los habitantes de la lista $ciudades$, este n\'umero mayor a 50.000 ser\'a sumado. 
 	La \'unica forma de que la sumatoria total no sea mayor a 50.000 ser\'ia si existiera alg\'un n\'umero negativo entre los que se suman.
-	Sabemos que esto no sucede gracias a otra condici\'on del requiere: 
+	Sabemos que esto no sucede gracias a otra condici\'on de $P$: 
 	\begin{equation}
 		\paraTodo[unalinea]{i}{\ent}{0 \le i < |ciudades| \implicaLuego ciudades[i].habitantes \ge 0}
 	\end{equation}
+	\item $\{I \land B \land v_{0} = f_{v}\}S\{f_{v} < v_{0}\} \iff \{I \land B \land v_{0} = f_{v}\} \implies wp(S, f_{v} < v_{0})$: Solo se agregan condiciones a la izquierda de la implicación 
+	que no son necesarias para la validez, porque ya lo demostramos sin estas. 
+	\item $I \land f_{v} \le 0 \implies \neg B$: Solo se agregan condiciones a la izquierda de la implicación 
+	que no son necesarias para la validez, porque ya lo demostramos sin estas. 
 
-Por lo tanto, el progama siempre devuelve un n\'umero mayor a 50.000.
+
+
+\end{itemize}
+
+	
+\section{Anexo}
+	\subsection{Solución alternativa al ejercicio 4}
+		Para este procedimiento usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con $P$ una matriz,
+		$P^{-1}$ inversa de $P$ y $D$ una matriz diagonal, es decir, que todos sus valores son cero menos los de su diagonal, se cumple que la diagonal
+		de $D$ tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$.
+		
+		Notar que no todas las matrices son diagonalizables, pero sí lo son aquellas que son cuadradas y simétricas,
+		es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este procedimiento lo son (por consigna y por requiere).
+		
+		\begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
+			\requiere{n \ge 1}
+			\requiere{|conexi\acute{o}n| > 0}
+			\requiere{conexi\acute{o}n = C_{0}}
+			\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
+			\asegura{\existe[unalinea]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{\\(|C_{0}| = |P| \land
+			|C_{0}| = |PInversa| \land |C_{0}| = |diagonal| \land |C_{0}| = |diagonalElevada| \land \\
+			esCuadrada(P) \land esCuadrada(PInversa) \land esCuadrada(diagonal) \land esCuadrada(diagonalElevada)) \yLuego \\
+			esInversa(P, PInversa) \land \\
+			esDiagonal(diagonal) \land \\
+			esDiagonal(diagonalElevada) \land \\
+			esDiagonalElevada(diagonal, diagonalElevada, n) \land \\
+			esProductoTripleDeMatrices(P, diagonal, PInversa, C_{0}) \land \\
+			esProductoTripleDeMatrices(P, diagonalElevada, PInversa, conexi\acute{o}n)}}
+			
+			\vspace{0.3cm}
+			
+			\pred{todosCerosOUnos}{matriz : \TLista{\TLista{\ent}}}
+			{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego (matriz[i][j] = 0 \lor matriz[i][j] = 1)}}
+			
+			\vspace{0.3cm}
+			
+			Para el siguiente predicado usaremos que $A*A^{-1} = I$ donde $I$ es la matriz identidad.
+			
+			\pred{esInversa}{matrizOriginal : \TLista{\TLista{\ent}}, matrizInversa : \TLista{\TLista{\ent}}}
+			{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizOriginal| \implicaLuego \\ 
+			((i = j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 1) \lor \\
+			(i \neq j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 0))}}
+			
+			\pred{esDiagonal}{matriz : \TLista{\TLista{\ent}}}
+			{\paraTodo[unalinea]{i, j}{\ent}{(0 \leq i, j < |matriz| \land i \neq j) \implicaLuego matriz[i][j] = 0}}
+			
+			\vspace{0.3cm}
+			Para el siguiente predicado usaremos que elevar una matriz diagonal a la $n$ es lo mismo que elevar cada n\'umero 
+			de la diagonal a la $n$. Aqu\'i es donde el problema deja de tratarse de elevar matrices a la $n$, y pasa a 
+			tratarse de elevar n\'umeros a $n$, algo que podemos hacer con facilidad.
+			
+			\pred{esDiagonalElevada}{matrizDiagonal : \TLista{\TLista{\ent}}, matrizDiagonalElevada : \TLista{\TLista{\ent}}, n : \ent}
+			{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matrizDiagonal| \implicaLuego matrizDiagonalElevada[i][i] = (matrizDiagonal[i][i])^{n}}}
+			
+			\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
+			{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
+			(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
+			
+			\pred{esProductoTripleDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizFactor3 : \TLista{\TLista{\ent}},
+			matrizProducto : \TLista{\TLista{\ent}}}
+			{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
+			(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
+			esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
+			
+			\vspace{0.3cm}
+			Aclaraci\'on: todos estos predicados est\'an diseñados sabiendo que todas las matrices que recibirán serán cuadradas y del mismo tamaño.
+			Nos aseguramos de que esto suceda en la primera parte del asegura, y luego la separamos del llamado a estos predicados con un y-luego. De esta forma, estamos seguros de que 
+			estos predicados nunca reciben matrices que los puedan indefinir.
+		\end{proc}
+	
+
 
 \vspace{4cm}
 	ACÁ TERMINA EL TP IGNOREN LO QUE SIGUE, LO DEJE POR SI ME SIRVE DESPUES PARA HACER ALGO MÁS 
