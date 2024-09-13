@@ -58,13 +58,14 @@
 	\pred{habitantesSumados}{listaSuma : \TLista{Ciudad}, listaMenores : \TLista{Ciudad}, listaMayores : \TLista{Ciudad}}
 	{\paraTodo[unalinea]{i}{\ent}{0 \le i < |listaSuma| \implicaLuego
 	\existe[unalinea]{j, k}{\ent}{0 \le j, k < |listaMenores| \yLuego \\ 
-	(ciudadSuma[i].nombre = ciudadMenor[j].nombre \land ciudadSuma[i].nombre = ciudadMayor[k].nombre \land \\
-	ciudadSuma[i].habitantes = ciudadMenor[j].habitantes + ciudadMayor[k].habitantes)}}}
+	(listaSuma[i].nombre = listaMenor[j].nombre \land listaSuma[i].nombre = listaMayor[k].nombre \land \\
+	listaSuma[i].habitantes = listaMenor[j].habitantes + listaMayor[k].habitantes)}}}
 \end{proc}
 	
 \subsection{Ejercicio 3}
 
 \begin{proc}{hayCamino}{\In distancias : \TLista{\TLista{\ent}}, \In desde : \ent, \In hasta : \ent}{\bool}
+	\requiere{|distacias| > 0 \land 0 \le desde < |distancias| \land 0 \le hasta < |distancias|}
 	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land diagonalEsCero(distancias) \land valoresNoNegativos(distancias))}
 	\asegura{res = True \iff \existe[unalinea]{camino}{\TLista{\ent}}{esCamino(distancias, desde, hasta, camino)}}
 \end{proc}
@@ -82,13 +83,9 @@
 {\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego matriz[i][j] \ge 0}}
 
 \pred{esCamino}{distancias : \TLista{\TLista{\ent}}, desde : \ent, hasta : \ent, camino : \TLista{\ent}}
-{ciudadesValidas(camino, |distancias|) \yLuego \\
-(|camino| \geq 2 \land ciudadesConectadas(distancias, camino) \land \\
+{|camino| \geq 2 \land ciudadesConectadas(distancias, camino) \land \\
 camino[0] = desde \land
-camino[|camino| - 1] = hasta)} 
-
-\pred{ciudadesValidas}{camino : \TLista{\ent}, numeroDeCiudades : \ent}
-{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| \implicaLuego camino[i] < numeroDeCiudades}}
+camino[|camino| - 1] = hasta} 
 
 \pred{ciudadesConectadas}{distancias : \TLista{\TLista{\ent}}, camino : \TLista{\ent}}
 {\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| - 1 \implicaLuego distancias[camino[i]][camino[i + 1]] > 0}}
@@ -103,6 +100,8 @@ Notar que no todas las matrices son diagonalizables, pero sí lo son aquellas qu
 es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este programa lo son (por consigna y por requiere).
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
+	\requiere{n \ge 1}
+	\requiere{|conexi\acute{o}n| > 0}
 	\requiere{conexi\acute{o}n = C_{0}}
 	\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
 	\asegura{\existe[unalinea]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{\\(|C_{0}| = |P| \land
@@ -149,15 +148,22 @@ es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este
 	{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
 	(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
 	esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
+	
+	\vspace{0.3cm}
+	Aclaraci\'on: todos estos predicados est\'an diseñados sabiendo que todas las matrices que recibirán serán cuadradas. Nos aseguramos de que esto 
+	suceda en la primera parte del asegura, y luego la separamos del llamado a estos predicados con un y-luego. De esta forma, estamos seguros de que 
+	estos predicados nunca reciben matrices que los puedan indefinir.
 \end{proc}
 
 \pagebreak
 
 SOLUCION ALTERNATIVA AL EJERCICIO 4
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
+	\requiere{n \ge 1}
+	\requiere{|conexi\acute{o}n| > 0}
 	\requiere{conexi\acute{o}n = C_{0}}
 	\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
-	\asegura{\existe[unalinea]{secuenciaDeMatrices}{\TLista{\TLista{\TLista{\ent}}}}{|secuenciaDeMatrices| = n - 1 \yLuego\\
+	\asegura{\existe[unalinea]{secuenciaDeMatrices}{\TLista{\TLista{\TLista{\ent}}}}{|secuenciaDeMatrices| = n \yLuego\\
 	(secuenciaDeMatrices[0] = C_{0} \land \\
 	esSecuenciaDePotencias(secuenciaDeMatrices) \land \\
 	conexi\acute{o}n = secuenciaDeMatrices[n - 1])}}
@@ -171,7 +177,9 @@ SOLUCION ALTERNATIVA AL EJERCICIO 4
 	esProductoDeMatrices(secuenciaDeMatrices[i - 1], secuenciaDeMatrices[0], secuenciaDeMatrices[i])}}
 	
 	\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
-	{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
+	{(|matrizFactor1| = |matrizFactor2| \land |matrizFactor1| = |matrizProducto| \land \\
+	esCuadrada(matrizFactor1) \land esCuadrada(matrizFactor2) \land esCuadrada(matrizProducto)) \yLuego \\
+	\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
 	(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
 	
 \end{proc}
@@ -181,11 +189,12 @@ SOLUCION ALTERNATIVA AL EJERCICIO 4
 \subsection{Ejercicio 5}
 
 \begin{proc}{caminoM\'inimo}{\In origen : \ent, \In destino : \ent, \In distancias : \TLista{\TLista{\ent}}}{\TLista{\ent}}
+	\requiere{|distacias| > 0 \land 0 \le origen < |distancias| \land 0 \le destino < |distancias|}
 	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land diagonalEsCero(distancias) \land valoresNoNegativos(distancias))}
-	\asegura{esCamino(distancias, origen, destino, res) \implicaLuego \\
+	\asegura{(esCamino(distancias, origen, destino, res) \yLuego \\
 	(\paraTodo[unalinea]{otroCamino}{\TLista{\ent}}{esCamino(distancias, origen, destino, otroCamino) \implicaLuego \\
-	distanciaRecorrida (otroCamino, distancias) \ge distanciaRecorrida (res, distancias)})}
-	\asegura{\neg esCamino(distancias, origen, destino, res) \implicaLuego res = \textlangle \textrangle}
+	distanciaRecorrida (otroCamino, distancias) \ge distanciaRecorrida (res, distancias)})) \lor \\
+	(\neg esCamino(distancias, origen, destino, res) \land res = \textlangle \textrangle)}
 	
 	\vspace{0.3cm}
 
@@ -197,13 +206,20 @@ SOLUCION ALTERNATIVA AL EJERCICIO 4
 \section{Demostraciones de correctitud}
 \subsection{Ejercicio 1}
 Para demostrar la correctitud de la implementaci\'on con respecto a la especificaci\'on utilizaremos
-el teorema del invariante y el teorema de terminaci\'on. Con respecto a nuestro programa, llamamos:
+la monoton\'ia sobre el programa que est\'a compuesto por dos sentencias y un ciclo.
+Con respecto a nuestro programa, llamamos:
 \vspace{0.3cm}\\
+$P \equiv \{\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
+\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
+\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \}$\\
 $P_{c} \equiv \{\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
 \paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
-\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \land
+\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \land\\
 i = 0 \land res = 0\}$\\
-$Q_{c} \equiv \{res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\}$\\
+$Q_{c} \equiv Q \equiv \{res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\}$\\
+$T1 \equiv res := 0$\\
+$T2 \equiv i := 0$\\
+$T \equiv T1;T2$\\
 $B \equiv \{i < |ciudades|\}$\\
 $\neg B \equiv \{i \ge |ciudades|\}$\\
 $S1 \equiv res := res + ciudades[i].habitantes$\\
@@ -211,7 +227,36 @@ $S2 \equiv i := i + 1$\\
 $S \equiv S1; S2$
 \vspace{0.3cm}
 
+Para demostrar la correctitud por monoton\'ia de la tripla de Hoare $\{P\}T;while...\{Q\}$ debemos probar:
+\begin{itemize}
+	\item $P \implies wp(T, P_{c})$
+	\item $P_{c} \implies wp(while..., Q)$
+\end{itemize}
 
+Veamos que $P \implies wp(T, P_{c})$\\
+Buscamos $wp(T, P_{c}) \equiv\\
+\equiv wp(T1;T2, P_{c})\\
+\overset{\text{AX3}}{\equiv} wp(T1, wp(T2, P_{c}))\\
+\equiv wp(res := 0, wp(i := 0, P_{c}))\\
+\overset{\text{AX1}}{\equiv} wp(res := 0, def(0) \yLuego (\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
+\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
+\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \land\\
+0 = 0 \land res = 0))\\
+\overset{\text{AX1}}{\equiv} def(0) \yLuego (\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
+\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
+\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \land\\
+0 = 0)\\
+\equiv \existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
+\paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
+\paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre}\\
+\equiv P$\\
+
+Finalmente, $P \implies P \equiv True \ \checkmark$\\
+Por lo tanto, se demostr\'o que $P \implies wp(T, P_{c})$.
+\vspace{0.3cm}
+
+Para probar la validez de $P_{c} \implies wp(while..., Q)$ utilizaremos el teorema del invariante y el teorema de terminaci\'on.
+Notar que $Q \equiv Q_{c}$ as\'i que los usaremos de forma indistinta.
 Proponemos el siguiente invariante: \\
 \begin{equation}
 	I \equiv \{0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes\}
@@ -238,20 +283,22 @@ Proponemos el siguiente invariante: \\
 	\overset{\text{AX1}}{\equiv} def(ciudades[i].habitantes) \yLuego 0 \le i + 1 \le |ciudades| \yLuego res + ciudades[i].habitantes = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes\\
 	\equiv 0 \le i < |ciudades| \yLuego -1 \le i < |ciudades| \yLuego res + ciudades[i].habitantes = \sum\nolimits_{j=0}^{i} ciudades[j].habitantes\\
 	\equiv 0 \le i < |ciudades| \yLuego res  = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes + ciudades[i].habitantes - ciudades[i].habitantes\\
-	\equiv 0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes$
+	\equiv 0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes \equiv wp(S, I)$
 	\vspace{0.3cm}\\
 	Finalmente, veamos que $\{I \land B\} \implies wp(S,I)$\\
 	$((0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes) \land i < |ciudades|) \implies wp(S,I)$\\
 	$(0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes) \implies (0 \le i < |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$\\
-	El predecente y el consecuente de esta implicacai\'on son id\'enticos, por lo tanto es una tautolog\'ia. \checkmark
+	El predecente y el consecuente de esta implicaci\'on son id\'enticos, por lo tanto es una tautolog\'ia. \checkmark
 	\item $I \land \neg B \implies Q_{c}\\
 	((0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes) \land i \ge |ciudades|) \implies Q_{c}\\
 	(|ciudades| \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes|) \implies Q_{c}\\
 	(i = |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes|) \implies Q_{c}\\
 	res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \implies res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\\$
-	De nuevo, el predecente y el consecuente de esta implicacai\'on son id\'enticos, por lo tanto es una tautolog\'ia. \checkmark
+	De nuevo, el predecente y el consecuente de esta implicaci\'on son id\'enticos, por lo tanto es una tautolog\'ia. \checkmark
 \end{enumerate}
-Queda demostrado parcialmente el progama. Para demostrar que el ciclo termina y el programa es v\'alido utilizaremos el teorema de terminaci\'on. 
+
+Por el teorema del invariante, queda demostrada parcialmente la correctitud del ciclo. Para demostrar que el ciclo termina utilizaremos el 
+teorema de terminaci\'on. 
 Proponemos la siguiente funci\'on variante:\\
 \begin{equation}
 		f_{v} = |ciudades| - i
@@ -267,7 +314,7 @@ Proponemos la siguiente funci\'on variante:\\
 		\overset{\text{AX1}}{\equiv} wp(S1, def(i + 1) \yLuego |ciudades| - (i + 1) < v_{0})\\
 		\equiv wp(res := res + ciudades[i].habitantes, |ciudades| - i - 1 < v_{0})\\
 		\overset{\text{AX1}}{\equiv} def(res + ciudades[i].habitantes) \yLuego |ciudades| - i - 1 < v_{0}\\
-		\equiv 0 \le i < |ciudades| \yLuego |ciudades| - i - 1 < v_{0}$
+		\equiv 0 \le i < |ciudades| \yLuego |ciudades| - i - 1 < v_{0} \equiv wp(S, f_{v} < v_{0})$
 		\vspace{0.3cm}\\
 		Finalmente, veamos que $\{I \land B \land v_{0} = f_{v}\} \implies wp(S, f_{v} < v_{0})\\
 		((0 \le i \le |ciudades| \yLuego \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes}) \land i < |ciudades| \land v_{0} = |ciudades| - i) \implies wp(S, f_{v} < v_{0})\\
@@ -283,7 +330,13 @@ Proponemos la siguiente funci\'on variante:\\
 		i = |ciudades| \implies i \ge |ciudades| \ \checkmark$
 	\end{enumerate}
 	Aclaraci\'on: En estos dos \'ultimos \'items se ignora el valor de res al momento de demostrar la implicaci\'on final porque no es relevante
-	para la validez de esta. Los dos casos fueron \underline{subrayados}.
+	para la validez de esta. Los dos casos fueron \underline{subrayados}.\\
+
+	Finalmente, por el teorema del invariante y el teorema de terminaci\'on, se demostr\'o que $P_{c} \implies wp(while..., Q)$.\\
+
+	Por monoton\'ia, la tripla de Hoare $\{P\}T;while...\{Q\}$ es v\'alida.
+
+	Luego, podemos afirmar que la implementaci\'on del programa es correcta respecto de su especificaci\'on.
 	
 \subsection{Ejercicio 2}
 En el requiere se incluye la condici\'on
