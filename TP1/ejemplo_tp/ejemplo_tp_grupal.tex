@@ -36,7 +36,7 @@
 \end{proc}
 
 \pred{noHayNombresRepetidos}{listaDeCiudades : \TLista{Ciudad}}
-{\paraTodo[unalinea]{i, j}{\ent}{(0 \le i, j < |listaDeCiudades| \land i \neq j)  \implicaLuego  (ciudades[i].nombre \neq ciudades[j].nombre)\\}}
+{\paraTodo[unalinea]{i, j}{\ent}{(0 \le i, j < |listaDeCiudades| \land i \neq j)  \implicaLuego  (listaDeCiudades[i].nombre \neq listaDeCiudades[j].nombre)\\}}
 
 \pred{habitantesNoNegativos}{listaDeCiudades : \TLista{Ciudad}}
 {\paraTodo[unalinea]{elemento}{Ciudad}{elemento \in listaDeCiudades \implicaLuego elemento.habitantes \ge 0}}
@@ -65,7 +65,7 @@
 \subsection{Ejercicio 3}
 
 \begin{proc}{hayCamino}{\In distancias : \TLista{\TLista{\ent}}, \In desde : \ent, \In hasta : \ent}{\bool}
-	\requiere{|distacias| > 0 \land 0 \le desde < |distancias| \land 0 \le hasta < |distancias|}
+	\requiere{|distancias| > 0 \land 0 \le desde < |distancias| \land 0 \le hasta < |distancias|}
 	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land diagonalEsCero(distancias) \land valoresNoNegativos(distancias))}
 	\asegura{res = True \iff \existe[unalinea]{camino}{\TLista{\ent}}{esCamino(distancias, desde, hasta, camino)}}
 \end{proc}
@@ -83,12 +83,13 @@
 {\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego matriz[i][j] \ge 0}}
 
 \pred{esCamino}{distancias : \TLista{\TLista{\ent}}, desde : \ent, hasta : \ent, camino : \TLista{\ent}}
-{|camino| \geq 2 \land ciudadesConectadas(distancias, camino) \land \\
+{|camino| \geq 2 \yLuego (ciudadesConectadas(distancias, camino) \land 
 camino[0] = desde \land
-camino[|camino| - 1] = hasta} 
+camino[|camino| - 1] = hasta)} 
 
 \pred{ciudadesConectadas}{distancias : \TLista{\TLista{\ent}}, camino : \TLista{\ent}}
-{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| - 1 \implicaLuego distancias[camino[i]][camino[i + 1]] > 0}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| \implicaLuego 0 \le camino[i] < |distancias|} \yLuego \\ 
+\paraTodo[unalinea]{i}{\ent}{0 \leq i < |camino| - 1  \implicaLuego distancias[camino[i]][camino[i + 1]] > 0}}
 
 \subsection{Ejercicio 4}
 
@@ -97,7 +98,7 @@ $P^{-1}$ inversa de $P$ y $D$ una matriz diagonal, es decir, que todos sus valor
 de $D$ tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$.
 
 Notar que no todas las matrices son diagonalizables, pero sí lo son aquellas que son cuadradas y simétricas,
-es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este programa lo son (por consigna y por requiere).
+es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este procedimiento lo son (por consigna y por requiere).
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
 	\requiere{n \ge 1}
@@ -150,8 +151,8 @@ es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este
 	esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
 	
 	\vspace{0.3cm}
-	Aclaraci\'on: todos estos predicados est\'an diseñados sabiendo que todas las matrices que recibirán serán cuadradas. Nos aseguramos de que esto 
-	suceda en la primera parte del asegura, y luego la separamos del llamado a estos predicados con un y-luego. De esta forma, estamos seguros de que 
+	Aclaraci\'on: todos estos predicados est\'an diseñados sabiendo que todas las matrices que recibirán serán cuadradas y del mismo tamaño.
+	Nos aseguramos de que esto suceda en la primera parte del asegura, y luego la separamos del llamado a estos predicados con un y-luego. De esta forma, estamos seguros de que 
 	estos predicados nunca reciben matrices que los puedan indefinir.
 \end{proc}
 
@@ -189,7 +190,7 @@ SOLUCION ALTERNATIVA AL EJERCICIO 4
 \subsection{Ejercicio 5}
 
 \begin{proc}{caminoM\'inimo}{\In origen : \ent, \In destino : \ent, \In distancias : \TLista{\TLista{\ent}}}{\TLista{\ent}}
-	\requiere{|distacias| > 0 \land 0 \le origen < |distancias| \land 0 \le destino < |distancias|}
+	\requiere{|distancias| > 0 \land 0 \le origen < |distancias| \land 0 \le destino < |distancias|}
 	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land diagonalEsCero(distancias) \land valoresNoNegativos(distancias))}
 	\asegura{(esCamino(distancias, origen, destino, res) \yLuego \\
 	(\paraTodo[unalinea]{otroCamino}{\TLista{\ent}}{esCamino(distancias, origen, destino, otroCamino) \implicaLuego \\
