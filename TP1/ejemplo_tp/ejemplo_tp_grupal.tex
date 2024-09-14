@@ -244,7 +244,7 @@ Proponemos la siguiente funci\'on variante:\\
 		((0 \le i \le |ciudades| \yLuego \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes}) \land i < |ciudades| \land v_{0} = |ciudades| - i) \implies wp(S, f_{v} < v_{0})\\
 		(0 \le i < |ciudades| \land v_{0} = |ciudades| - i) \implies (0 \le i < |ciudades| \yLuego |ciudades| - i - 1 < v_{0})$
 		\begin{itemize}
-			\item $0 \le i < |ciudades| \implies 0 \le i < |ciudades| \ \checkmark$
+			\item $0 \le i < |ciudades| \implies 0 \le i < |ciudades|$ Es cierto ya que tiene precedente y concecuente idénticos$ \ \checkmark$
 			\item $v_{0} = |ciudades| - i \implies |ciudades| - i - 1 < |ciudades| - i \iff - 1 < 0 \ \checkmark$
 		\end{itemize}
 		\item $I \land f_{v} \le 0 \implies \neg B\\
@@ -298,14 +298,15 @@ demostrar la correctitud completa de nuevo, los cinco puntos valdrán porque:
 	\begin{equation}
 		\paraTodo[unalinea]{i}{\ent}{0 \le i < |ciudades| \implicaLuego ciudades[i].habitantes \ge 0}
 	\end{equation}
+	Por lo tanto, $(res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \land P) \implies res > 50.000$
 	\item $\{I \land B \land v_{0} = f_{v}\}S\{f_{v} < v_{0}\} \iff \{I \land B \land v_{0} = f_{v}\} \implies wp(S, f_{v} < v_{0})$: Solo se agregan condiciones a la izquierda de la implicación 
 	que no son necesarias para la validez, porque ya lo demostramos sin estas. 
 	\item $I \land f_{v} \le 0 \implies \neg B$: Solo se agregan condiciones a la izquierda de la implicación 
 	que no son necesarias para la validez, porque ya lo demostramos sin estas. 
 \end{itemize}
 
-Ya que $P$ y $P_{c}$ se mantuvieron iguales a las originales, la demostración de la validez de $P \implies wp(T, P_{c})$ sigue igual. Por monotonía, la implementación es correcta con respecto a la especificación también con 
-esta invariante y $Q_{c}$.
+Ya que $P$ y $P_{c}$ se mantuvieron iguales a las originales, la demostración de la validez de $P \implies wp(T, P_{c})$ sigue igual y acabamos de ver que también valdrá $P_{c} \implies wp(while..., Q)$. 
+Por monotonía, la implementación es correcta con respecto a la especificación también con esta invariante y $Q_{c}$ donde $res > 50.000$.
 	
 \section{Anexo}
 	\subsection{Solución alternativa al ejercicio 4}
