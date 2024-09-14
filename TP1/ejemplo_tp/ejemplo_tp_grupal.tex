@@ -46,7 +46,7 @@
 
 \begin{proc}{sumaDeHabitantes}{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{\TLista{Ciudad}}
 	\requiere{noHayNombresRepetidos(menoresDeCiudades) \land noHayNombresRepetidos(mayoresDeCiudades)}
-	\requiere{habitantesNoNegativos(menoresDeCiudades \land habitantesNoNegativos(mayoresDeCiudades))}
+	\requiere{habitantesNoNegativos(menoresDeCiudades) \land habitantesNoNegativos(mayoresDeCiudades)}
 	\requiere{|menoresDeCiudades| = |mayoresDeCiudades| \yLuego \\ mismosNombres(menoresDeCiudades, mayoresDeCiudades)}
 	\asegura{|res| = |menoresDeCiudades| \yLuego (mismosNombres(res, menoresDeCiudades) \land \\ habitantesSumados(res, menoresDeCiudades, mayoresDeCiudades))}
 	
@@ -84,7 +84,7 @@
 {\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego matriz[i][j] \ge 0}}
 
 \pred{esCamino}{distancias : \TLista{\TLista{\ent}}, desde : \ent, hasta : \ent, camino : \TLista{\ent}}
-{|camino| \geq 2 \yLuego ciudadesValidas(distancias, camino) \yLuego (ciudadesConectadas(distancias, camino) \land \\
+{(|camino| \geq 2 \land ciudadesValidas(distancias, camino)) \yLuego (ciudadesConectadas(distancias, camino) \land \\
 camino[0] = desde \land
 camino[|camino| - 1] = hasta)} 
 
@@ -98,7 +98,6 @@ camino[|camino| - 1] = hasta)}
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
 	\requiere{n \ge 1}
-	\requiere{|conexi\acute{o}n| > 0}
 	\requiere{conexi\acute{o}n = C_{0}}
 	\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
 	\asegura{\existe[unalinea]{secuenciaDeMatrices}{\TLista{\TLista{\TLista{\ent}}}}{|secuenciaDeMatrices| = n \yLuego\\
@@ -120,6 +119,9 @@ camino[|camino| - 1] = hasta)}
 	\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
 	(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
 	
+	Aclaración: en esProductoDeMatrices pedimos que todas las matrices sean cuadradas y del mismo tamaño ya que sabemos
+	que las potencias de una matriz cuadrada siempre seguirán siendo cuadradas y del mismo tamaño que la original y porque
+	es necesario para que no se indefina el producto entre ellas (no siempre se pueden multiplicar matrices de tamaños distintos).
 \end{proc}
 
 \subsection{Ejercicio 5}
@@ -128,8 +130,8 @@ camino[|camino| - 1] = hasta)}
 	\requiere{|distancias| > 0 \land 0 \le origen < |distancias| \land 0 \le destino < |distancias|}
 	\requiere{esCuadrada(distancias) \yLuego \\ (esSimetrica(distancias) \land diagonalEsCero(distancias) \land valoresNoNegativos(distancias))}
 	\asegura{(esCamino(distancias, origen, destino, res) \yLuego \\
-	(\paraTodo[unalinea]{otroCamino}{\TLista{\ent}}{esCamino(distancias, origen, destino, otroCamino) \implicaLuego \\
-	distanciaRecorrida (otroCamino, distancias) \ge distanciaRecorrida (res, distancias)})) \lor \\
+	\paraTodo[unalinea]{otroCamino}{\TLista{\ent}}{esCamino(distancias, origen, destino, otroCamino) \implicaLuego \\
+	distanciaRecorrida (otroCamino, distancias) \ge distanciaRecorrida (res, distancias)}) \lor \\
 	(\neg esCamino(distancias, origen, destino, res) \land res = \textlangle \textrangle)}
 	
 	\vspace{0.3cm}
@@ -277,15 +279,16 @@ Pero notando que $ciudades$ es un parámetro $in$ podemos asegurar que $ciudades
 sabemos que sigue cumpliendo $P$ al final de este. Entonces, utilizando esta propiedad de los parámetros $in$ no es necesario 
 demostrar la correctitud completa de nuevo, los cinco puntos valdrán porque:
 \begin{itemize}
-	\item $P_{c} \implies I$: Sigue valiendo porque solo se agregan a $I$ condiciones que ya estaban en $P_{c}$.
+	\item $P_{c} \implies I$: Sigue valiendo porque solo se agregan a $I$ las condiciones de $P$ que ya estaban en $P_{c}$.
 	\item $\{I \land B\}S\{I\}$: Sigue valiendo que el invariante no cambia luego de una iteración del ciclo porque solo se agregan condiciones sobre $ciudades$, que al ser $in$ 
-	no es modificado por $S$ (no varía, es invariante).
+	no es modificado por $S$ ($ciudades$ no varía, es invariante).
 	\item $I \land \neg B \implies Q_{c}\\
 	((0 \le i \le |ciudades| \yLuego (res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes \land P)) \land i \ge |ciudades|) \implies Q_{c}\\
 	(|ciudades| \le i \le |ciudades| \yLuego (res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes| \land P)) \implies Q_{c}\\
 	(i = |ciudades| \yLuego (res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes| \land P)) \implies Q_{c}\\
 	res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \land P \implies res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \land res > 50.000\\$
-	Sabemos que $res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \implies res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \equiv True$ \\
+	Sabemos que $res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \implies res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \equiv True$ porque
+	precedente y consecuente son id\'enticos.\\
 	Y sabiendo que se cumple $P$, podemos hacer la siguiente deducción sobre $res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes$. \\
 	En $P$ se incluye la condici\'on
 	\begin{equation}
@@ -300,201 +303,76 @@ demostrar la correctitud completa de nuevo, los cinco puntos valdrán porque:
 	\end{equation}
 	Por lo tanto, $(res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes \land P) \implies res > 50.000$
 	\item $\{I \land B \land v_{0} = f_{v}\}S\{f_{v} < v_{0}\} \iff \{I \land B \land v_{0} = f_{v}\} \implies wp(S, f_{v} < v_{0})$: Solo se agregan condiciones a la izquierda de la implicación 
-	que no son necesarias para la validez, porque ya lo demostramos sin estas. 
+	que no son necesarias para la validez y no la afectan, ya la demostramos sin estas. 
 	\item $I \land f_{v} \le 0 \implies \neg B$: Solo se agregan condiciones a la izquierda de la implicación 
-	que no son necesarias para la validez, porque ya lo demostramos sin estas. 
+	que no son necesarias para la validez y no la afectan, ya la demostramos sin estas. 
 \end{itemize}
 
 Ya que $P$ y $P_{c}$ se mantuvieron iguales a las originales, la demostración de la validez de $P \implies wp(T, P_{c})$ sigue igual y acabamos de ver que también valdrá $P_{c} \implies wp(while..., Q)$. 
 Por monotonía, la implementación es correcta con respecto a la especificación también con esta invariante y $Q_{c}$ donde $res > 50.000$.
 	
-\section{Anexo}
-	\subsection{Solución alternativa al ejercicio 4}
-		Para este procedimiento alternativo usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con $P$ una matriz,
-		$P^{-1}$ inversa de $P$ y $D$ una matriz diagonal, es decir, que todos sus valores son cero menos los de su diagonal, se cumple que la diagonal
-		de $D$ tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$.
-		
-		Notar que no todas las matrices son diagonalizables, pero sí lo son aquellas que son cuadradas y simétricas,
-		es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este procedimiento lo son (por consigna y por requiere).
-		
-		\begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
-			\requiere{n \ge 1}
-			\requiere{|conexi\acute{o}n| > 0}
-			\requiere{conexi\acute{o}n = C_{0}}
-			\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
-			\asegura{\existe[unalinea]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{\\(|C_{0}| = |P| \land
-			|C_{0}| = |PInversa| \land |C_{0}| = |diagonal| \land |C_{0}| = |diagonalElevada| \land \\
-			esCuadrada(P) \land esCuadrada(PInversa) \land esCuadrada(diagonal) \land esCuadrada(diagonalElevada)) \yLuego \\
-			esInversa(P, PInversa) \land \\
-			esDiagonal(diagonal) \land \\
-			esDiagonal(diagonalElevada) \land \\
-			esDiagonalElevada(diagonal, diagonalElevada, n) \land \\
-			esProductoTripleDeMatrices(P, diagonal, PInversa, C_{0}) \land \\
-			esProductoTripleDeMatrices(P, diagonalElevada, PInversa, conexi\acute{o}n)}}
-			
-			\vspace{0.3cm}
-			
-			\pred{todosCerosOUnos}{matriz : \TLista{\TLista{\ent}}}
-			{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego (matriz[i][j] = 0 \lor matriz[i][j] = 1)}}
-			
-			\vspace{0.3cm}
-			
-			Para el siguiente predicado usaremos que $A*A^{-1} = I$ donde $I$ es la matriz identidad.
-			
-			\pred{esInversa}{matrizOriginal : \TLista{\TLista{\ent}}, matrizInversa : \TLista{\TLista{\ent}}}
-			{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizOriginal| \implicaLuego \\ 
-			((i = j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 1) \lor \\
-			(i \neq j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 0))}}
-			
-			\pred{esDiagonal}{matriz : \TLista{\TLista{\ent}}}
-			{\paraTodo[unalinea]{i, j}{\ent}{(0 \leq i, j < |matriz| \land i \neq j) \implicaLuego matriz[i][j] = 0}}
-			
-			\vspace{0.3cm}
-			Para el siguiente predicado usaremos que elevar una matriz diagonal a la $n$ es lo mismo que elevar cada n\'umero 
-			de la diagonal a la $n$. Aqu\'i es donde el problema deja de tratarse de elevar matrices a la $n$, y pasa a 
-			tratarse de elevar n\'umeros a $n$, algo que podemos hacer con facilidad.
-			
-			\pred{esDiagonalElevada}{matrizDiagonal : \TLista{\TLista{\ent}}, matrizDiagonalElevada : \TLista{\TLista{\ent}}, n : \ent}
-			{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matrizDiagonal| \implicaLuego matrizDiagonalElevada[i][i] = (matrizDiagonal[i][i])^{n}}}
-			
-			\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
-			{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
-			(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
-			
-			\pred{esProductoTripleDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizFactor3 : \TLista{\TLista{\ent}},
-			matrizProducto : \TLista{\TLista{\ent}}}
-			{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
-			(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
-			esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
-			
-			\vspace{0.3cm}
-			Aclaraci\'on: todos estos predicados est\'an diseñados sabiendo que todas las matrices que recibirán serán cuadradas y del mismo tamaño.
-			Nos aseguramos de que esto suceda en la primera parte del asegura, y luego la separamos del llamado a estos predicados con un y-luego. De esta forma, estamos seguros de que 
-			estos predicados nunca reciben matrices que los puedan indefinir.
-		\end{proc}
+\section{Anexo: Solución alternativa al ejercicio 4}
+	Para este procedimiento alternativo usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con $P$ una matriz,
+	$P^{-1}$ inversa de $P$ y $D$ una matriz diagonal, es decir, que todos sus valores son cero menos los de su diagonal, se cumple que la diagonal
+	de $D$ tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$.
 	
-
-
-\vspace{4cm}
-	ACÁ TERMINA EL TP IGNOREN LO QUE SIGUE, LO DEJE POR SI ME SIRVE DESPUES PARA HACER ALGO MÁS 
+	Notar que no todas las matrices son diagonalizables, pero sí lo son aquellas que son cuadradas y simétricas,
+	es decir, que verifican $M = M^{T}$. Todas las matrices que se introducen a este procedimiento lo son (por consigna y por requiere).
 	
-	\vspace{4cm}
-
-Lo principal: las fórmulas. Se puede poner en una linea, como $x_i = x_{i-1} + x_{i-2}$, o ponerse más grande:
-
-\begin{equation}
-	\sum\limits_{i=0}^{n} i
-	\label{eq:1}
-\end{equation}
-
-Y se pueden citar ecuaciones con \verb|\eqref{nombreDeEq}|: \eqref{eq:1}
-
-Ejemplo de itemizado:
-
-\begin{itemize}
-	\item Item 1
-	\item Item 2
-	\item Item 3
-\end{itemize}
-
-Ejemplo de enumerado con menor distancia entre items:
-
-\begin{enumerate} \setlength\itemsep{0cm}
-	\item Item 1
-	\item Item 2
-	\item Item 3
-\end{enumerate}
-
-Podemos escribir mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto.
-
-Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo.
-
-\vspace{0.3cm}
-
-Le agregamos una separación entre párrafos. Le agregamos una separación entre párrafos. Le agregamos una separación entre párrafos. Le agregamos una separación entre párrafos. Le agregamos una separación entre párrafos.
-
-\vspace{0.3cm}
-
-La tabla \ref{tab:ejemplo} es un ejemplo de cómo se hace una tabla.
-
-\begin{table}[h!]
-	\centering
-	\begin{tabular}{||l c c r||} 
-		\hline
-		Col1 & Col2 & Col2 & Col3 \\ [0.5ex] 
-		\hline\hline
-		1 & 6 & 87837 & 787 \\ 
-		2 & 7 & 78 & 5415 \\
-		3 & 545 & 778 & 7507 \\
-		4 & 545 & 18744 & 7560 \\
-		5 & 88 & 788 & 6344 \\
-		\hline
-	\end{tabular}
-	\caption{Ejemplo de tabla}
-	\label{tab:ejemplo}
-\end{table}
-
-
-La figura \ref{fig:subfigs} es un ejemplo de cómo se agrega una imagen.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.6\textwidth]{logo_dc.jpg}
-	\caption{Ejemplo de figura}
-	\label{fig:ejemplo}
-\end{figure}
-
-\begin{figure}[ht!]
-	\begin{subfigure}{0.5\textwidth}
-		\includegraphics[width=0.9\linewidth]{LaTeX-project} 
-		\caption{Logo de LaTeX}
-		\label{fig:subfig1}
-	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
-		\includegraphics[width=0.7\linewidth]{TeX}
-		\caption{Logo de TeX}
-		\label{fig:subfig2}
-	\end{subfigure}
-	\caption{Ejemplo para poner dos figuras juntas. Y citarlas por separado a (\subref{fig:subfig1}) y (\subref{fig:subfig2}).}
-	% OJO: el caption siempre va antes del label
-	\label{fig:subfigs}
-\end{figure}
-
-
-
-% Para hacer que quede todo en una misma linea, se puede usar minipage
-%\begin{minipage}[t]{\textwidth}
-	\begin{lstlisting}[caption={Ejemplo de código (usando los estilos de la cátedra, ver las macros para más detalles)},label=code:for]
-res := 0;
-i := 0;
-while (i < s.size()) do
-	res := res + s[i];
-	i := i + 1
-endwhile
-	\end{lstlisting}
-%\end{minipage}
-
-Si se pone un label al \verb|lstlisting|, se puede referenciar: Código \ref{code:for}.
-
-
-\subsection{Macros de la cátedra para especificar}
-
-\begin{proc}{nombre}{\In paramIn : \nat, \Inout paramInout : \TLista{\ent}}{tipoRes}
-	%    \modifica{parametro1, parametro2,..}
-	\requiere{expresionBooleana1}
-	\asegura{expresionBooleana2}
-	\aux{auxiliar1}{parametros}{tipoRes}{expresion}
-	\pred{pred1}{parametros}{expresion} 
-\end{proc}
-
-\aux{auxiliarSuelto}{parametros}{tipoRes} {\sum\limits_{i=0}^{n} i}
-
-% \paraTodo{variable}{tipo}{expresion}
-% \existe{variable}{tipo}{expresion}
-% Pueden tener [unalinea] para que no se divida en varias lineas
-\pred{predSuelto}{parametros}{\paraTodo[unalinea]{variable}{tipo}{algo \implicaLuego expresion}}
-\pred{predSuelto}{parametros}{\existe[unalinea]{variable}{tipo}{(p \land q) \implicaLuego (r \yLuego s)}}
-
-
+	\begin{proc}{cantidadCaminosNSaltos}{\Inout conexi\'on : \TLista{\TLista{\ent}}, \In n : \ent}{}
+		\requiere{n \ge 1}
+		\requiere{|conexi\acute{o}n| > 0}
+		\requiere{conexi\acute{o}n = C_{0}}
+		\requiere{esCuadrada(conexi\acute{o}n) \yLuego \\ (esSimetrica(conexi\acute{o}n) \land diagonalEsCero(conexi\acute{o}n) \land todosCerosOUnos(conexi\acute{o}n))}
+		\asegura{\existe[unalinea]{P, PInversa, diagonal, diagonalElevada}{\TLista{\TLista{\ent}}}{\\(|C_{0}| = |P| \land
+		|C_{0}| = |PInversa| \land |C_{0}| = |diagonal| \land |C_{0}| = |diagonalElevada| \land \\
+		esCuadrada(P) \land esCuadrada(PInversa) \land esCuadrada(diagonal) \land esCuadrada(diagonalElevada)) \yLuego \\
+		esInversa(P, PInversa) \land \\
+		esDiagonal(diagonal) \land \\
+		esDiagonal(diagonalElevada) \land \\
+		esDiagonalElevada(diagonal, diagonalElevada, n) \land \\
+		esProductoTripleDeMatrices(P, diagonal, PInversa, C_{0}) \land \\
+		esProductoTripleDeMatrices(P, diagonalElevada, PInversa, conexi\acute{o}n)}}
+		
+		\vspace{0.3cm}
+		
+		\pred{todosCerosOUnos}{matriz : \TLista{\TLista{\ent}}}
+		{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matriz| \implicaLuego (matriz[i][j] = 0 \lor matriz[i][j] = 1)}}
+		
+		\vspace{0.3cm}
+		
+		Para el siguiente predicado usaremos que $A*A^{-1} = I$ donde $I$ es la matriz identidad.
+		
+		\pred{esInversa}{matrizOriginal : \TLista{\TLista{\ent}}, matrizInversa : \TLista{\TLista{\ent}}}
+		{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizOriginal| \implicaLuego \\ 
+		((i = j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 1) \lor \\
+		(i \neq j \land \sum\nolimits_{k=0}^{|matrizOriginal| - 1} (matrizOriginal[i][k] * matrizInversa[k][j]) = 0))}}
+		
+		\pred{esDiagonal}{matriz : \TLista{\TLista{\ent}}}
+		{\paraTodo[unalinea]{i, j}{\ent}{(0 \leq i, j < |matriz| \land i \neq j) \implicaLuego matriz[i][j] = 0}}
+		
+		\vspace{0.3cm}
+		Para el siguiente predicado usaremos que elevar una matriz diagonal a la $n$ es lo mismo que elevar cada n\'umero 
+		de la diagonal a la $n$. Aqu\'i es donde el problema deja de tratarse de elevar matrices a la $n$, y pasa a 
+		tratarse de elevar n\'umeros a $n$, algo que podemos hacer con facilidad.
+		
+		\pred{esDiagonalElevada}{matrizDiagonal : \TLista{\TLista{\ent}}, matrizDiagonalElevada : \TLista{\TLista{\ent}}, n : \ent}
+		{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matrizDiagonal| \implicaLuego matrizDiagonalElevada[i][i] = (matrizDiagonal[i][i])^{n}}}
+		
+		\pred{esProductoDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizProducto : \TLista{\TLista{\ent}}}
+		{\paraTodo[unalinea]{i, j}{\ent}{0 \leq i, j < |matrizProducto| \implicaLuego \\ 
+		(matrizProducto[i][j] = \sum\nolimits_{k=0}^{|matrizProducto| - 1} (matrizFactor1[i][k] * matrizFactor2[k][j]))}}
+		
+		\pred{esProductoTripleDeMatrices}{matrizFactor1 : \TLista{\TLista{\ent}}, matrizFactor2 : \TLista{\TLista{\ent}}, matrizFactor3 : \TLista{\TLista{\ent}},
+		matrizProducto : \TLista{\TLista{\ent}}}
+		{\existe[unalinea]{matrizAuxiliar}{\TLista{\TLista{\ent}}}{(esCuadrada(matrizAuxiliar) \land |matrizAuxiliar| = |matrizFactor1|) \yLuego \\
+		(esProductoDeMatrices(matrizFactor1, matrizFactor2, matrizAuxiliar) \land \\
+		esProductoDeMatrices(matrizAuxiliar, matrizFactor3, matrizProducto))}}
+		
+		\vspace{0.3cm}
+		Aclaraci\'on: todos estos predicados est\'an diseñados sabiendo que todas las matrices que recibirán serán cuadradas y del mismo tamaño.
+		Nos aseguramos de que esto suceda en la primera parte del asegura, y luego la separamos del llamado a estos predicados con un y-luego. De esta forma, estamos seguros de que 
+		estos predicados nunca reciben matrices que los puedan indefinir.
+	\end{proc}
 
 \end{document}
