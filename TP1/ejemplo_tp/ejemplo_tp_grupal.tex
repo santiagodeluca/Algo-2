@@ -10,7 +10,7 @@
 
 \fecha{\today}
 
-\materia{Materia de la carrera}
+\materia{Algoritmos y Estructuras de Datos}
 \grupo{FOREJOLKBXQRUOORILHN}
 
 \integrante{De Luca, Santiago Leonel}{4/24}{santidelu510@gmail.com}
@@ -32,14 +32,15 @@
 
 \begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad}}{\TLista{Ciudad}}
 	\requiere{noHayNombresRepetidos(ciudades) \land habitantesNoNegativos(ciudades)}
-	\asegura{C \in res \iff (C \in ciudades \yLuego C.habitantes > 50.000)}
+	\asegura{C \in res \iff (C \in ciudades \land C.habitantes > 50.000)}
+	\asegura{noHayNombresRepetidos(res)}
 \end{proc}
 
 \pred{noHayNombresRepetidos}{listaDeCiudades : \TLista{Ciudad}}
 {\paraTodo[unalinea]{i, j}{\ent}{(0 \le i, j < |listaDeCiudades| \land i \neq j)  \implicaLuego  (listaDeCiudades[i].nombre \neq listaDeCiudades[j].nombre)\\}}
 
 \pred{habitantesNoNegativos}{listaDeCiudades : \TLista{Ciudad}}
-{\paraTodo[unalinea]{elemento}{Ciudad}{elemento \in listaDeCiudades \implicaLuego elemento.habitantes \ge 0}}
+{\paraTodo[unalinea]{elemento}{Ciudad}{elemento \in listaDeCiudades \implica elemento.habitantes \ge 0}}
 
 \subsection{Ejercicio 2}
 
@@ -144,20 +145,19 @@ Para demostrar la correctitud de la implementaci\'on con respecto a la especific
 la monoton\'ia sobre el programa que est\'a compuesto por dos sentencias y un ciclo.
 Con respecto a nuestro programa, llamamos:
 \vspace{0.3cm}\\
-
 $P \equiv \{\existe[unalinea]{j}{\ent}{0 \le j < |ciudades| \yLuego ciudades[j].habitantes > 50.000} \land \\
 \paraTodo[unalinea]{j}{\ent}{0 \le j < |ciudades| \implicaLuego ciudades[j].habitantes \ge 0} \land \\
 \paraTodo[unalinea]{j, k}{\ent}{0 \le j < k < |ciudades| \implicaLuego ciudades[j].nombre \neq ciudades[k].nombre} \}$\\
 $P_{c} \equiv \{P \land i = 0 \land res = 0\}$\\
 $Q_{c} \equiv Q \equiv \{res = \sum\nolimits_{j=0}^{|ciudades| - 1} ciudades[j].habitantes\}$\\
-$T1 \equiv res := 0$\\
-$T2 \equiv i := 0$\\
-$T \equiv T1;T2$\\
+$T1 : res := 0$\\
+$T2 : i := 0$\\
+$T : T1;T2$\\
 $B \equiv \{i < |ciudades|\}$\\
 $\neg B \equiv \{i \ge |ciudades|\}$\\
-$S1 \equiv res := res + ciudades[i].habitantes$\\
-$S2 \equiv i := i + 1$\\
-$S \equiv S1; S2$
+$S1 : res := res + ciudades[i].habitantes$\\
+$S2 : i := i + 1$\\
+$S : S1; S2$
 \vspace{0.3cm}
 
 Para demostrar la correctitud por monoton\'ia de la tripla de Hoare $\{P\}T;while...\{Q\}$ debemos probar:
@@ -190,8 +190,8 @@ Proponemos el siguiente invariante: \\
 	\item $P_{c} \implies I$\\
 	$(i = 0 \land res = 0) \implies (0 \le i \le |ciudades| \yLuego res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes)$
 	\begin{itemize}
-		\item $i = 0 \implies 0 \le 0 \le |ciudades| \ \checkmark$ 
-		\item $(i = 0 \land res = 0) \implies 0 = \sum\nolimits_{j=0}^{- 1} ciudades[j].habitantes \ \checkmark$
+		\item $i = 0 \implies 0 \le i \le |ciudades|$ es cierto ya que $0 \le |ciudades| \ \checkmark$ 
+		\item $(i = 0 \land res = 0) \implies res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes$ es cierto ya que $0 = \sum\nolimits_{j=0}^{- 1} ciudades[j].habitantes \ \checkmark$
 	\end{itemize}
 	Aclaraci\'on: para la demostraci\'on de esta implicaci\'on no utilizamos el existencial y los universales que
 	hab\'ian quedado en $P_{c}$ por la precondici\'on del programa porque no son necesarios para la validez de esta.
@@ -251,7 +251,7 @@ Proponemos la siguiente funci\'on variante:\\
 		((0 \le i \le |ciudades| \yLuego \underline{res = \sum\nolimits_{j=0}^{i - 1} ciudades[j].habitantes}) \land |ciudades| - i \le 0) \implies i \ge |ciudades|\\
 		(0 \le i \le |ciudades| \land |ciudades| \le i) \implies i \ge |ciudades|\\
 		|ciudades| \le i \le |ciudades| \implies i \ge |ciudades|\\
-		i = |ciudades| \implies i \ge |ciudades| \ \checkmark$
+		i = |ciudades| \implies i \ge |ciudades|$ es cierto ya que $|ciudades| \ge |ciudades| \ \checkmark$
 	\end{enumerate}
 	Aclaraci\'on: En estos dos \'ultimos \'items se ignora el valor de res al momento de demostrar la implicaci\'on final porque no es relevante
 	para la validez de esta. Los dos casos fueron \underline{subrayados}.\\
@@ -302,15 +302,14 @@ demostrar la correctitud completa de nuevo, los cinco puntos valdrán porque:
 	que no son necesarias para la validez, porque ya lo demostramos sin estas. 
 	\item $I \land f_{v} \le 0 \implies \neg B$: Solo se agregan condiciones a la izquierda de la implicación 
 	que no son necesarias para la validez, porque ya lo demostramos sin estas. 
-
-
-
 \end{itemize}
 
+Ya que $P$ y $P_{c}$ se mantuvieron iguales a las originales, la demostración de la validez de $P \implies wp(T, P_{c})$ sigue igual. Por monotonía, la implementación es correcta con respecto a la especificación también con 
+esta invariante y $Q_{c}$.
 	
 \section{Anexo}
 	\subsection{Solución alternativa al ejercicio 4}
-		Para este procedimiento usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con $P$ una matriz,
+		Para este procedimiento alternativo usaremos que para cualquier matriz $M$ que cumpla que $M = PDP^{-1}$ con $P$ una matriz,
 		$P^{-1}$ inversa de $P$ y $D$ una matriz diagonal, es decir, que todos sus valores son cero menos los de su diagonal, se cumple que la diagonal
 		de $D$ tiene los autovalores de la matriz $M$ y por lo tanto $M^{n} = PD^{n}P^{-1}$.
 		
