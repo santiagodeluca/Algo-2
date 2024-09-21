@@ -31,19 +31,30 @@ class ArregloRedimensionableDeRecordatorios {
     }
 
     public void quitarAtras() {
-        // Implementar
+        Recordatorio[] r = new Recordatorio[a.length - 1];
+        for (int j = 0; j < a.length - 1; j++) {
+            r[j] = a[j];
+        }
+        a = r;
     }
 
     public void modificarPosicion(int indice, Recordatorio valor) {
-        // Implementar
+        a[indice] = valor;
     }
 
     public ArregloRedimensionableDeRecordatorios(ArregloRedimensionableDeRecordatorios vector) {
-        // Implementar
+        Recordatorio[] r = new Recordatorio[vector.longitud()];
+        for (int j = 0; j < vector.longitud(); j ++) {
+            r[j] = vector.obtener(j);
+        }
+        a = r;
     }
 
     public ArregloRedimensionableDeRecordatorios copiar() {
-        // Implementar
-        return null;
+        ArregloRedimensionableDeRecordatorios r = new ArregloRedimensionableDeRecordatorios();
+        for (int j = 0; j < a.length; j ++) {
+            r.agregaAtras(a[j]);
+        }
+        return r;
     }
 }
