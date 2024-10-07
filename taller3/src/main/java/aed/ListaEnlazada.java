@@ -84,41 +84,66 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
 
     public void modificarPosicion(int indice, T elem) {
-        throw new UnsupportedOperationException("No implementada aun");
+        Nodo actual = primero;
+        for (int j = 0; j < indice; j++) {
+            actual = actual.sig;
+        }
+        actual.valor = elem;
     }
 
     public ListaEnlazada(ListaEnlazada<T> lista) {
-        throw new UnsupportedOperationException("No implementada aun");
+        for (int i = 0; i < lista.longitud(); i++){
+            this.agregarAtras(lista.obtener(i));
+        }
     }
     
     @Override
     public String toString() {
-        throw new UnsupportedOperationException("No implementada aun");
+        String res = "[" + this.obtener(0) + ',';
+        for (int i = 1; i < this.longitud() - 1; i++){
+            res = res + " " + this.obtener(i) + ",";
+        }
+        res = res + ' ' + this.obtener(this.longitud() - 1) + ']';
+        return res;
     }
 
     private class ListaIterador implements Iterador<T> {
     	// Completar atributos privados
-
+        private int indice;
+        ListaIterador(){
+            indice = 0;
+        }
+        
         public boolean haySiguiente() {
-	        throw new UnsupportedOperationException("No implementada aun");
+            return indice != longitud();
         }
         
         public boolean hayAnterior() {
-	        throw new UnsupportedOperationException("No implementada aun");
+	        return indice != 0;
         }
 
         public T siguiente() {
-	        throw new UnsupportedOperationException("No implementada aun");
+            if(indice != longitud()){
+                indice++;
+                return obtener(indice-1);
+            } else {
+                return obtener(indice);
+            }
         }
         
 
         public T anterior() {
-	        throw new UnsupportedOperationException("No implementada aun");
+            if(indice != 0){
+                indice--;
+                return obtener(indice);
+            } else {
+                return obtener(0);
+            }
         }
     }
 
     public Iterador<T> iterador() {
-	    throw new UnsupportedOperationException("No implementada aun");
+	    return new ListaIterador();
     }
 
 }
