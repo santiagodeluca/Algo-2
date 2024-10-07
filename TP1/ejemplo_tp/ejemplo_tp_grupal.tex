@@ -132,7 +132,7 @@ camino[|camino| - 1] = hasta)}
 	\asegura{(esCamino(distancias, origen, destino, res) \yLuego \\
 	\paraTodo[unalinea]{otroCamino}{\TLista{\ent}}{esCamino(distancias, origen, destino, otroCamino) \implicaLuego \\
 	distanciaRecorrida (otroCamino, distancias) \ge distanciaRecorrida (res, distancias)}) \lor \\
-	(\neg esCamino(distancias, origen, destino, res) \land res = \textlangle \textrangle)}
+	(\paraTodo[unalinea]{posibleCamino}{\TLista{\ent}}{\neg esCamino(distancias, origen, destino, posibleCamino)} \implica res = \textlangle \textrangle)}
 	
 	\vspace{0.3cm}
 	
