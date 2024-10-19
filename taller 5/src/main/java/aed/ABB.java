@@ -4,10 +4,8 @@ package aed;
 // elem1.compareTo(elem2) devuelve un entero. Si es mayor a 0, entonces elem1 > elem2
 public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     // Agregar atributos privados del Conjunto
-        
     private Nodo raiz;
     private int cardinal;
-    private int altura;
         
         private class Nodo {
             // Agregar atributos privados del Nodo
@@ -16,19 +14,18 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             Nodo der;
             Nodo padre;
 
+            // Crear Constructor del nodo
             Nodo(T v) {
                 valor = v;
                 izq = null;
                 der = null;
                 padre = null;
             }
-        // Crear Constructor del nodo
     }
 
     public ABB() {
         raiz = null;
         cardinal = 0;
-        altura = 0;
     }
 
     public int cardinal() {
@@ -57,16 +54,13 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         if (raiz == null){
             raiz = nuevo;
             cardinal += 1;
-            altura += 1;
         } else if (!pertenece(elem)){
             Nodo cercano = masCercano(elem);
             nuevo.padre = cercano;
             if (elem.compareTo(cercano.valor) > 0){
                 cercano.der = nuevo;
-                altura += 1;
             } else if (elem.compareTo(cercano.valor) < 0){
                 cercano.izq = nuevo;
-                altura += 1;
             }
             cardinal += 1;
         }
@@ -81,7 +75,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                 return actual;
             } else if (elem.compareTo(actual.valor) == 0) {
                 return actual;
-            }else if (elem.compareTo(actual.valor) > 0){
+            } else if (elem.compareTo(actual.valor) > 0){
                 actual = actual.der;
             } else if (elem.compareTo(actual.valor) < 0){
                 actual = actual.izq;
@@ -118,10 +112,10 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             } else {
                 eliminaNodoConDosHijos(objetivo);
             }
+            
         } else if (pertenece(elem) && cardinal == 1){
             cardinal -= 1;
             raiz = null; 
-            altura = 0;
         }
     }
     
@@ -131,9 +125,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         } else if (objetivo.valor.compareTo(objetivo.padre.valor) < 0){
             objetivo.padre.izq = null;
         }
-
         cardinal -= 1;
-        
     }
 
     private void eliminaNodoUnicoHijo(Nodo objetivo, int lado){
@@ -158,10 +150,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                 raiz = objetivo.izq;
             }
         }
-
         cardinal -= 1;
-        
-
     }
 
     private Nodo sucesor(Nodo nodo){
@@ -207,14 +196,26 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     }
 
     private class ABB_Iterador implements Iterador<T> {
-        private Nodo _actual;
+        private Nodo actual;
+        private T maximo;
+
+        ABB_Iterador(){
+            actual = masCercano(minimo());
+            maximo = maximo();
+        }
 
         public boolean haySiguiente() {            
-            throw new UnsupportedOperationException("No implementada aun");
+            return maximo.compareTo(actual.valor) != 0;
         }
     
         public T siguiente() {
-            throw new UnsupportedOperationException("No implementada aun");
+            if (haySiguiente()) {
+                T valorActual = actual.valor;
+                actual = sucesor(actual);
+                return valorActual;
+            } else {
+                return actual.valor;
+            }
         }
     }
 
