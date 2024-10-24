@@ -637,7 +637,7 @@ El TAD Diccionario está observado con un diccionario dict.
 			D.data[D.tam]$_0$ := k
 			D.data[D.tam]$_1$ := v
 			D.tam++
-		else 
+		else // si no tengo espacio disponible no me sirve de nada saber que el elemento no pertence (en esta estructura)
 			nuevosDatos := new Array<K,V>[D.tam+1]
 			i := 0 
 			while i < D.tam 
