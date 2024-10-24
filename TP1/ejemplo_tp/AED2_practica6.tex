@@ -1,0 +1,715 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage{amssymb}
+
+\usepackage{listings}
+\usepackage{color}
+
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  mathescape,         
+  literate={_0}{$_0$}{1}
+  {_1}{$_1$}{1}
+  {_2}{$_2$}{1},
+  aboveskip=3mm,
+  literate={'}{{'}}{1},
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\input{AEDmacros}
+
+\begin{document}
+\title{AED 2 - Práctica 6}
+\author{Santiago De Luca}
+
+\maketitle
+
+\section{Practica 6}
+\subsection{Ejercicio 1}
+
+
+\begin{lstlisting}
+	proc agregarAtras(inout L: listaEnlazada<T>, in T:T) // O(1)
+		Nodo := new NodoLista<T>
+		Nodo.valor := T
+		Nodo.siguiente := Null
+		if L.longitud == 0 then
+			L.primero := Nodo
+			L.ultimo := Nodo
+		else 
+			L.ultimo.siguiente := Nodo
+			L.ultimo = Nodo
+		endif
+		L.longitud ++
+
+	proc obtener(in L:listaEnlazada, in i : Z) : T
+		actual := L.primero
+		j := 0
+		while j < i // O(n) -> todo el proc esta en O(n)
+			actual := actual.siguiente
+			j++
+		endwhile
+		return actual.valor
+
+	proc eliminar(inout : listaEnlazada<T>, in i : Z)
+		if L.longitud := 1
+			L.primero := null
+			L.ultimo := null
+		else
+			actual := L.primero
+			j := 0
+			while j < i-1 // O(n) -> todo el proc esta en O(n)
+				actual := actual.siguiente
+				j++
+			endwhile
+			actual.siguiente := actual.siguiente.siguiente
+			L.longitud := L.longitud - 1
+		endif
+
+	proc concatenar (inout L1:listaEnlazada<T>, in L2:listaEnlazada<T>) //O(1)
+		L1.ultimo.siguiente := L2.primero
+		L1.ulitmo := L2.ultimo
+		L1.longitud := L1.longitud + L2.longitud
+\end{lstlisting}
+
+\subsection{Ejercicio 2}
+
+\begin{lstlisting}
+	Modulo ConjuntoArr<T> implementa ConjuntoAcotado<T>{
+		Var datos: Array<T>
+		Var tam : int
+		
+\end{lstlisting}
+
+\pred{invRep}{C : $ConjuntoArr<T>$}
+{0 \le C.tam \le C.datos.length \\
+\land noHayRepetidos(C)}
+
+\pred{noHayRepetidos}{C : $ConjuntoArr<T>$}
+{\paraTodo[unalinea]{i, j}{Z}{(0 \le i,j < C.tam \land i \neq j) \implicaLuego C.datos[i] \neq C.datos[j]}}
+
+\pred{Abs}{C : $ConjuntoArr<T>$, C' : $ConjuntoAcotado<T>$}
+{C.datos.length = C'.capacidad \land C.tam = |C'.elems|\\ 
+\paraTodo[unalinea]{e}{T}{e \in C'.elems \iff pertenece(subseq(C.datos, 0, C.tam), e)}}
+
+\pred{pertenece}{A : $Array<T>$, e : $T$}
+{\existe[unalinea]{i}{Z}{0 \le i < A.length \implicaLuego A[i] = e}}
+
+\begin{lstlisting}
+	proc conjVacio(in capacidad:Z) : ConjuntoArr<T>
+		res := new conjArr<T>
+		res.datos := new Array<T>[capacidad]
+		res.tam := 0
+		return res
+
+	proc pertenece(in C:ConjuntoArr<T>, in e:T) : bool
+		res := False
+		i := 0
+		while i < C.tam
+			if C.datos[i] == e then
+				res := True
+			endif
+			i++
+		endwhile
+		return res
+
+
+	// asumo que el agregar tiene como requiere que haya espacio en el conjunto
+	proc agregar(inout C:ConjuntoArr<T>, in e:T) 
+		if !pertenece(C,e) then
+			C.datos[C.tam] := e
+			C.tam++
+		endif
+
+	proc unir(inout C:ConjuntoArr<T>, in C':ConjuntoArr<T>)
+		i := 0
+		while i < C'.tam
+			agregar(C,C'.datos[i])
+			i++
+		endwhile
+
+	proc sacar(inout C:ConjuntoArr<T>, in e:T)
+		if pertenece(C,e) then
+			if C.tam $\le$ 1 then
+				C.tam := 0
+			else
+				i := 0 
+				while C.datos[i] != e
+					i++
+				endwhile
+				C.datos[i] := C.datos[C.tam - 1]
+				C.tam := C.tam - 1
+			endif
+		endif
+
+
+	// este se ve raro por la forma en la que implemente sacar
+	proc intersecar(inout C:ConjuntoArr<T>, in C':ConjuntoArr<T>) 
+		i := 0 
+		while i < C.tam
+			if !pertenece(C', C.datos[i]) then
+				sacar(C,C.datos[i])
+			else
+				i++
+			endif
+		endwhile
+	}
+\end{lstlisting}
+
+\subsection{Ejercicio 3}
+
+\begin{lstlisting}
+	Modulo ConjuntoLista<T> implementa Conjunto<T>{
+		Var datos: listaEnlazada<T>
+		Var tam : int
+		
+\end{lstlisting}
+
+Según el apunte, en el invRep y Abs cuando se predica sobre un módulo que es variable de control de otro módulo 
+hay que hacer referencia a los observadores del TAD que implementa. listaEnlazada implementa Secuencia y el TAD secuencia 
+está observado como una secuencia s.
+
+\pred{invRep}{C : $ConjuntoLista<T>$}
+{|C.datos.s| = C.tam \land noHayRepetidos(C.datos)}
+
+\pred{noHayRepetidos}{L : $listaEnlazada<T>$}
+{\paraTodo[unalinea]{i, j}{Z}{(0 \le i,j < |L.s| \land i \neq j) \implicaLuego L.s[i] \neq L.s[j]}}
+
+\pred{Abs}{C : $ConjuntoLista<T>$, C' : $Conjunto<T>$}
+{C.tam = |C'.elems| \land \\ 
+\paraTodo[unalinea]{e}{T}{e \in C'.elems \iff e \in C.datos.s}}
+
+\begin{lstlisting}
+	proc conjVacio() : ConjuntoLista<T> // O(1)
+		res := new ConjuntoLista<T>
+		res.datos := listaVacia()
+		res.tam := 0
+
+
+	// asumo que iterador.siguiente no solo devuelve el elemento sino que mueve el puntero al siguiente (eso interpreto del apunte, no esta la funcion iterador.avanzar)
+	proc pertenece(in C:ConjuntoLista<T>, in e:T) : bool // O(n)
+		res := False
+		it := itereador(C.datos) 
+		while it.HaySiguiente
+			if it.siguiente == e then 
+				res := True
+			endif
+		endwhile
+		return res
+
+	proc agregar(inout C:ConjuntoLista<T>, in e:T) // O(n)
+		if !pertenece(C,e) then
+			C.datos.agregarAtras(e)
+			C.tam++
+		endif
+
+	proc agregarRapido(inout C:ConjuntoLista<T>, in e:T) // O(1)
+		C.datos.agregarAtras(e)
+		C.tam++
+
+	proc sacar(inout C:ConjuntoLista<T>, in e:T) // O(n)
+		if pertenece(C,e) then
+			i := 0 
+			it := iterador(C.datos)
+			while it.HaySiguiente && it.siguiente != e
+				i++
+			endwhile
+			C.datos.eliminar(i)
+			C.tam--
+		endif
+
+	proc unir(inout C:ConjuntoLista<T>, in C':ConjuntoLista<T>) // O(C.tam * C'.tam)
+		it := iterador(C'.datos)
+		while it.HaySiguiente // se ejecuta O(C'.tam) veces
+			agregar(C,it.siguiente) // esta en O(C.tam)
+		endwhile
+
+	proc intersecar(inout C:ConjuntoLista<T>, in C':ConjuntoLista<T>) // O(C.tam * (C.tam + C'tam))
+		it := iterador(C.datos)
+		while it.HaySiguiente // O(C.tam)
+			e := it.siguiente
+			if !pertenece(C',e) then // O(C'.tam)
+				sacar(C,e) // O(C.tam)
+				C'.tam--
+			endif
+		endwhile
+
+	}
+\end{lstlisting}
+
+\subsection{Ejercicio 4}
+Este ejercicio me costó MAL. Así que es larguísimo. La consigna no era mega detallada, eso me confundió también.
+
+\begin{lstlisting}
+	Modulo Indice implementa Conjunto<Tupla<Z,Z,Z>>{
+		Var datos: Array<Tupla<Z,Z,Z>>
+		Var indice1: Array<Z>
+		Var indice2: Array<Z>
+\end{lstlisting}
+
+\pred{invRep}{I : $Indice$}
+{(I.datos.length = I.indice1.length \land I.datos.length = I.indice2.length) \yLuego \\
+\paraTodo[unalinea]{k}{Z}{0 \le k < I.indice1.length \implica (k \in I.indice1 \land k \in I.indice2)} \land
+componentesOrdenadas(I.datos, I.indice1, 1) \land componentesOrdenadas(I.datos, I.indice2, 2) \land \\
+primeraComponenteOrdenada(I.datos)}
+
+\pred{componentesOrdenadas}{datos : $Array<Tupla<Z,Z,Z>>$, indice :$Array<Z>$, componente : Z}
+{\paraTodo[unalinea]{i, j}{Z}{0 \le i < j < indice.length \implicaLuego (datos[indice[i]]_{componente} < datos[indice[j]]_{componente})}}
+
+\pred{primeraComponenteOrdenada}{datos : $Array<Tupla<Z,Z,Z>>$}
+{\paraTodo[unalinea]{i, j}{Z}{0 \le i < j < datos.length \implicaLuego datos[i]_{0} < datos[j]_{0}}}
+
+Estos últimos dos prcs implican que no hay valores repetidos en ninguna componente, gracias al menor estricto.
+En particular, implica que no hay triplas repetidas(estoy implementando el TAD Conjunto).
+
+\pred{Abs}{I : $Indice$, C : $Conjunto<Tupla<Z,Z,Z>>$}
+{|C.elems| = I.datos.length \land \\ 
+\paraTodo[unalinea]{e}{Tupla<Z,Z,Z>}{e \in C.elems \iff pertenece(C.datos, e)}}
+
+\begin{lstlisting}
+	proc indiceVacio() : Indice
+		res := new Indice
+		res.datos := new Array<Tupla<Z,Z,Z>>[0]
+		res.indice1 := new Array<Z>[0]
+		res.indice2 := new Array<Z>[0]
+		return res
+
+
+	// al principio interprete que habia que hacer era como un pertenece y aprovechar los indices para buscar, entonces lo hice con busqueda binaria. Como te imaginas, quedo larguisimo. La interpretacion mas corta es como si fuera un obtener, pero por indices: 
+	proc buscarPor(in I:indice, in componente:Z, in posicion:Z) : Tupla<Z,Z,Z>
+		if componente == 0 then
+			return I.datos[posicion]
+		else if componente == 1
+			return I.datos[indice1[posicion]]
+		else 
+			return I.datos[indice2[posicion]]
+
+	proc pertenece(in I:Indice, e:Tupla<Z,Z,Z>) : bool
+		i := 0 
+		while I.datos[i] != e 
+			i++
+		endwhile
+		return i < I.datos.length
+
+	proc agregar(inout I:Indice, in e:Tupla<Z,Z,Z>)
+		if !pertenece(I,e) then
+			nuevosDatos := new Array<Tupla<Z,Z,Z>[I.datos.length + 1]
+			if I.datos.length == 0 then
+				nuevosDatos[0] := e
+				I.datos := nuevosDatos
+				I.indice1 := new Array<Z>[1]
+				I.indice2 := new Array<Z>[1]
+				I.indice1[0] := 0
+				I.indice2[0] := 0
+			else 
+				i := 0 
+				while i < I.datos.length && I.datos[i]$_0$ < e$_0$
+					nuevosDatos[i] := I.datos[i]
+					i++
+				endwhile
+				pos := i 
+				nuevosDatos[i] := e 
+				i++
+				while i < nuevosDatos.length
+					nuevosDatos[i] := I.datos[i-1]
+				endwhile
+				j := 0
+				while j < I.indice1.length
+					if I.indice1[j] $\ge$ pos then
+						I.indice1[j] := I.indice1[j] + 1
+					endif
+					if I.indice2[j] $\ge$ pos then
+						I.indice2[j] := I.indice2[j] + 1
+					endif
+				endwhile
+
+				I.datos := nuevosDatos
+
+				I.indice1 := nuevoIndice(I.datos,I.indice1,pos,1)
+				I.indice2 := nuevoIndice(I.datos,I.indice2,pos,2)
+			endif
+		endif
+	
+	proc nuevoIndice(in datos:Array<Tupla<Z,Z,Z>>, in indice:Array<T>, in pos:Z, in componente:Z) : Array<T>
+		res := new Array<T>[indice.length + 1]
+		i := 0
+		while i < indice.length && datos[indice[i]]$_{componente}$ < datos[pos]$_{componente}$
+			res[i] = indice[i]
+			i++
+		endwhile
+		res[i] = pos
+		i++
+		while i < res.length
+			res[i] := indice[i-1]
+		endwhile
+		return res
+
+	proc sacar(inout I:Indice, in e:Tupla<Z,Z,Z>)
+		if pertenece(I,e) && I.datos.length != 1 then
+			posAEliminar := 0 
+			while posAEliminar < I.datos.length && e != I.datos[posAEliminar]
+				posAEliminar++
+			endwhile
+			nuevosDatos := new Array<Tupla<Z,Z,Z>>[I.datos.length - 1]
+			i := 0 
+			while i < posAEliminar
+				nuevosDatos[i] := I.datos[i]
+				i++
+			endwhile
+			i++
+			while i < I.datos.length
+				nuevosDatos[i-1] := I.datos[i]
+				i++
+			endwhile
+			I.indice1 = eliminaIndice(I.indice1, posAEliminar)
+			I.indice2 = eliminaIndice(I.indice2, posAEliminar)
+			j := 0 
+			while j < I.indice.1.length
+				if I.indice1[j] > posAEliminar
+					I.indice1[j] := I.indice1[j]-1
+				endif
+				if I.indice2[j] > posAEliminar
+					I.indice2[j] := I.indice2[j]-1
+				endif
+			endwhile
+			I.datos := nuevosDatos
+		else if pertenece(I,e) && I.datos.length == 1 then
+			I.datos := new Array<Tupla<Z,Z,Z>>[0]
+			I.indice1 := new Array<Z>[0]
+			I.indice2 := new Array<Z>[0]
+		endif
+
+	proc eliminaIndice(in indice:Array<Z>, in k:Z) : Array <Z>
+		res := new Array<Z>[indice.length-1]
+		i := 0
+		while indice[i] != k
+			res[i] := indice[i]
+			i++
+		endwhile
+		i++
+		while i < indice.length
+			res[i-1] := indice[i]
+			i++
+		endwhile
+		return res
+	}
+
+\end{lstlisting}
+
+\subsection{Ejercicio 5}
+Este ejercicio tiene varias formas de encarar el problema de diferenciar la cola vacía de la que tiene un elemento, yo hice una distinta
+a la que vimos en clase, con una variable más:
+
+\begin{lstlisting}
+	Modulo BufferCircular<T> implementa ColaAcotada<T>{
+		Var datos: Array<Z>
+		Var vacia: bool
+		Var inicio: Z
+		Var fin: Z
+\end{lstlisting}
+
+\pred{invRep}{B : $BufferCircular<T>$}
+{0 \le B.inicio < B.datos.length \land 0 \le B.fin < B.datos.length \land \\
+(B.vacia = True \implica B.fin = B.inicio) \land \\
+(B.inicio \neq B.fin \implica B.vacia = False)}
+
+Asumo que el TAD ColaAcotada está observado con una secuencia s (igual que el TAD cola) y con un entero capacidad.
+\pred{Abs}{B : $BufferCircular<T>$, C : $ColaAcotada<T>$}
+{C.capacidad = B.datos.length \land \\ (C.s = <> \iff (B.vacia = True \land B.inicio = B.fin)) \land \\
+((B.vacia = False \land B.inicio = B.fin) \implica |C.s| = 1) \land \\
+(B.inicio < B.final \implica C.s = subseq(B.datos, B.inicio, B.final + 1)) \land \\
+(B.final < B.inicio \implica C.s = subseq(B.datos, B.inicio, B.datos.length) ++ subseq(B.datos, 0, B.final + 1))}
+
+
+\begin{lstlisting}
+	proc nuevoBuffer(in cap:Z) : BufferCircular<T>
+		res := new BufferCircular<T>
+		res.datos := new Array<T>[cap]
+		res.inicio := 0
+		res.fin := 0
+		res.vacio := True
+		return res
+	
+	proc encolar(inout B:BufferCircular<T>, in e:T)
+		if B.vacia then
+			B.datos[B.fin] := e
+			B.vacia := False
+		else
+			B.fin := (B.fin + 1) % B.datos.length
+			B.datos[B.fin] := e
+		endif
+
+	
+	proc desencolar(inout B:BufferCircular<T>) : T // B.vacia == False por requiere de desencolar
+		res := B.datos[B.inicio]
+		if B.inicio == B.fin then
+			B.vacia := True
+		else 
+			B.inicio := (B.inicio + 1) % B.datos.length
+		endif
+		return res
+	}
+\end{lstlisting}
+
+\subsection{Ejercicio 6}
+
+\begin{lstlisting}
+	Modulo PilaAr<T> implementa Pila<T>{
+		Var datos: Array<T>
+		Var tam: Z
+		// agrego tam para que desapilar sea O(1), aunque apilar va a ser O(n) igual :(
+\end{lstlisting}
+
+\pred{invRep}{P : $PilaAr<T>$}
+{0 \le P.tam \le P.datos.length}
+
+El TAD Pila está observado con una secuencia s:
+
+\pred{Abs}{P : $PilaAr<T>$, P' : $Pila<T>$}
+{|P'.s| = P.tam \yLuego \\
+\paraTodo[unalinea]{i}{Z}{0 \le i < P.tam \implicaLuego P.datos[i] = P's[i]}}
+
+\begin{lstlisting}
+	proc pilaVacia() : PilaAr<T> // O(1)
+		res := new PilaArr<T>
+		res.tam := 0 
+		res.datos := new Array<T>[0]
+		return res
+
+	proc vacia(in P:PilaAr<T>) : bool // O(1)
+		return P.tam == 0
+
+	proc apilar(inout P:PilaAr<T>, in e:T) // O(n)
+		if P.datos.length != P.tam then // esta rama es O(1), con esta estructura no siempre apilar es O(n) :)
+			P.datos[P.tam] := e
+			P.tam ++
+		else
+			nuevosDatos := new Array[P.tam + 1] // O(n)
+			i := 0 
+			while i < P.tam // O(n)
+				nuevosDatos[i] := P.datos[i]
+			endwhile
+			nuevosDatos[P.tam] := e
+			P.tam++
+			P.datos := nuevosDatos
+		endif
+	proc desapilar(inout P:PilaAr<T>) : T // O(1)
+		res := P.datos[P.tam - 1]
+		P.tam := P.tam - 1
+		return res
+		
+	proc tope(in P:PilaAr<T>) : T // O(1)
+		res := P.datos[P.tam - 1]
+		return res
+	}
+\end{lstlisting}
+
+\begin{lstlisting}
+	Modulo PilaEnlazada<T> implementa Pila<T>{
+		Var datos: listaEnlazada<T>
+		// en esta estructura se invierten las complejidades con respecto a la anterior, apilar es O(1) pero desapilar(y tope) O(n)
+\end{lstlisting}
+
+Pensé bastante y no encontré restricciones para invRep
+
+\pred{invRep}{P : $PilaEnlazada<T>$}
+{True}
+
+listaEnlazada implementa el TAD secuencia que está observado con una secuencia s:
+
+\pred{Abs}{P : $PilaEnlazada<T>$, P' : $Pila<T>$}
+{|P'.s| = |P.datos.s| \land \\
+\paraTodo[unalinea]{i}{Z}{0 \le i < |P.datos.s| \implicaLuego P.datos.s[i] = P's[i]}}
+
+\begin{lstlisting}
+	proc pilaVacia() : PilaEnlazada<T> // O(1)
+		res := new PilaEnlazada<T>
+		res.datos := nre listaEnlazada<T>
+		return res
+
+	proc vacia(in P:PilaEnlazada<T>, in e:T) : bool  // O(1)
+		return vacia(P.datos)
+
+	proc apilar(inout P:PilaEnlazada<T>, in e:T)  // O(1)
+		P.datos.agregarAtras(e)
+
+	proc desapilar(in P:PilaEnlazada<T>) : T // O(n)
+		res := P.datos.obtener(P.datos.longitud - 1)
+		P.datos.eliminar(P.datos.longitud - 1)
+		return res
+
+	proc tope(in P:PilaEnlazada<T>) : T // O(n)
+		res := P.datos.obtener(P.datos.longitud - 1)
+		return res
+	}
+\end{lstlisting}
+
+\begin{lstlisting}
+	Modulo DicArr<K,V> implementa Diccionario<K,V>{
+		Var data: Array<Tupla<K,V>>
+		Var tam: Z
+\end{lstlisting}
+
+\pred{invRep}{D : $DicArr<K,V>$}
+{0 \le D.tam \le D.data.length \land \\
+\paraTodo[unalinea]{i, j}{Z}{(0 \le i, j < D.data.length \land i \neq j) \implicaLuego D.data[i]_{0} \neq D.data[j]_{0}}}
+
+El TAD Diccionario está observado con un diccionario dict.
+
+\pred{Abs}{D : $DicArr<K,V>$, D' : $Diccionario<K,V>$}
+{|D'.dict| = D.tam \land \\
+\paraTodo[unalinea]{e}{Tupla<K,V>}{pertenece(D,e) \iff (e_{0} \in D'.dict \yLuego D'dict[e_{0}] = e_{1})}}
+
+\pred{pertenece}{D : $DicArr<K,V>$, e: $Tupla<K,V>$}
+{\existe[unalinea]{i}{Z}{0 \le i < D.tam \yLuego D.data[i] = e}}
+
+\begin{lstlisting}
+	proc diccionarioVacio() : DicArr<K,V> // O(1)
+		res := new DicArr<K,V>
+		res.data := new Array<Tupla<K,V>>[0]
+		res.tam := 0
+		return res
+	
+	proc esta(in D:DicArr<K,V>, in k:K) : bool // O(n)
+		i := 0
+		while i < D.tam && D.data[i]$_0$ != k
+			i++
+		endwhile
+		return i != D.tam
+
+	// el proximo proc tiene como requiere que la clave este, o sea esta(D,k) == True
+	proc dondeEsta(in D:DicArr<K,V>, in k:K) : Z // O(n)
+		i := 0 
+		while i < D.tam && D.data[i]$_0$ != k
+			i++
+		endwhile
+		return i
+
+	proc definir(inout D:DicArr<K,V>, in k:K, in v:V) // O(n)
+		if esta(D,k) then // caso modificar clave existente
+			D.data[dondeEsta(D,k)]$_1$ := v
+		else if D.tam != D.data.length // caso agregar con espacio disponible
+			D.data[D.tam]$_0$ := k
+			D.data[D.tam]$_1$ := v
+			D.tam++
+		else // caso agregar sin espacio disponible 
+			nuevosDatos := new Array<K,V>[D.tam+1]
+			i := 0 
+			while i < D.tam 
+				nuevosDatos[i] := D.data[i]
+				i++
+			endwhile
+			nuevosDatos[D.tam]$_0$ = k
+			nuevosDatos[D.tam]$_1$ = v
+			D.tam++
+			D.data := nuevosDatos
+		endif
+
+	proc borrar(inout D:DicArr<K,V>, in k:K) // O(n)
+		pos := dondeEsta(D,k)
+		i := pos
+		while i < D.tam - 1
+			D.data[i] := D.data[i + 1]
+			i++
+		endwhile
+		D.tam--
+		
+	proc obtener(in D:DicArr<K,V>, in k:K) : V
+		return D.data[dondeEsta(D,k)]$_1$
+
+	proc definirRapido(inout D: DicArr<K,V>, in k:K, in v:V) // O(n) :(
+		if D.tam != D.data.length then 
+			D.data[D.tam]$_0$ := k
+			D.data[D.tam]$_1$ := v
+			D.tam++
+		else 
+			nuevosDatos := new Array<K,V>[D.tam+1]
+			i := 0 
+			while i < D.tam 
+				nuevosDatos[i] := D.data[i]
+				i++
+			endwhile
+			nuevosDatos[D.tam]$_0$ = k
+			nuevosDatos[D.tam]$_1$ = v
+			D.tam++
+			D.data := nuevosDatos
+		endif
+	
+	proc tamanio(in D:DicArr<K,V>) : Z // O(1)
+		return D.tam
+	}
+\end{lstlisting}
+
+
+\begin{lstlisting}
+	Modulo DictEnlazado<K,V> implementa Diccionario<K,V>{
+		Var data: listaEnlazada<Tupla<K,V>>
+\end{lstlisting}
+
+\pred{invRep}{D : $DictEnlazado<K,V>$}
+{\paraTodo[unalinea]{i, j}{Z}{(0 \le i, j < |D.data.s| \land i \neq j) \implicaLuego D.data.s[i]_{0} \neq D.data.s[j]_{0}}}
+
+\pred{Abs}{D : $DictEnlazado<K,V>$, D' : $Diccionario<K,V>$}
+{|D.data.s| = |D'.dict| \land \\
+\paraTodo[unalinea]{e}{Tupla<K,V>}{e \in D.data.s \iff (e_{0} \in D'.dict \yLuego D'dict[e_{0}] = e_{1})}}
+
+\begin{lstlisting}
+	proc diccionarioVacio() : DictEnlazado<K,V> // O(1)
+		res : = new DictEnlazado<K,V>
+		res.data := new listaEnlazada<K,V>[0]
+		return res
+
+	proc esta(in D:DictEnlazado<K,V>, in k:K) : bool // O(n)
+		i := 0 
+		it := iterador(D.data)
+		while it.HaySiguiente && it.siguiente$_0$ != k
+			i++
+		endwhile
+		return i < D.data.length
+
+	// el proximo proc tiene como requiere que la clave este, o sea esta(D,k) == True
+	proc dondeEsta(in D: DictEnlazado<K,V>, in k:K) // O(n)
+		i := 0 
+		it := iterador(D.data)
+		while it.HaySiguiente && it.siguiente$_0$ != k
+			i++
+		endwhile
+		return i
+
+	proc definir(inout D:DictEnlazado<K,V>, in k:K, in v:V) // O(n)
+		if esta(D, k) then
+			D.data.modicarPosicion(dondeEsta(D,k), Tupla<k,v>)
+		else
+			D.data.agregarAtras(<K,V>)
+		endif
+
+	proc obetener(in D:DictEnlazado<K,V>, in k:K) : V // O(n)
+		return D.data.obtener(dondeEsta(D,k))$_1$
+
+	proc borrar(inout D:DictEnlazado<K,V>, in k:K) // O(n)
+		D.data.eliminar(dondeEsta(D,K))
+
+	proc definirRapido(inout D:DictEnlazado<K,V>, in k:K, in v:V) // O(1) (no O(n) como la otra implementacion)
+		D.data.agregarAtras(Tupla<K,V>)
+
+	proc tamanio(in D:DictEnlazado<K,V>) : Z // O(1)
+		return D.data.length
+
+\end{lstlisting}
+
+\end{document}
