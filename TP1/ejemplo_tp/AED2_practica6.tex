@@ -40,6 +40,8 @@
 \maketitle
 
 \section{Practica 6}
+Aviso que no soy docente así que no hay nada que te asegura que los ejercicios estén bien ni mucho menos que sean la "solución esperada".
+Por otro lado, hay varios ejercicios que tienen más de una interpretación y estructura a elegir posibles así que puede haber muchas soluciones correctas distintas :)
 \subsection{Ejercicio 1}
 
 
@@ -86,6 +88,8 @@
 		L1.ulitmo := L2.ultimo
 		L1.longitud := L1.longitud + L2.longitud
 \end{lstlisting}
+ 
+\pagebreak
 
 \subsection{Ejercicio 2}
 
@@ -128,8 +132,6 @@
 		endwhile
 		return res
 
-
-	// asumo que el agregar tiene como requiere que haya espacio en el conjunto
 	proc agregar(inout C:ConjuntoArr<T>, in e:T) 
 		if !pertenece(C,e) then
 			C.datos[C.tam] := e
@@ -432,8 +434,8 @@ Asumo que el TAD ColaAcotada está observado con una secuencia s (igual que el T
 \pred{Abs}{B : $BufferCircular<T>$, C : $ColaAcotada<T>$}
 {C.capacidad = B.datos.length \land \\ (C.s = <> \iff (B.vacia = True \land B.inicio = B.fin)) \land \\
 ((B.vacia = False \land B.inicio = B.fin) \implica |C.s| = 1) \land \\
-(B.inicio < B.final \implica C.s = subseq(B.datos, B.inicio, B.final + 1)) \land \\
-(B.final < B.inicio \implica C.s = subseq(B.datos, B.inicio, B.datos.length) ++ subseq(B.datos, 0, B.final + 1))}
+(B.inicio < B.final \implicaLuego C.s = subseq(B.datos, B.inicio, B.final + 1)) \land \\
+(B.final < B.inicio \implicaLuego C.s = subseq(B.datos, B.inicio, B.datos.length) ++ subseq(B.datos, 0, B.final + 1))}
 
 
 \begin{lstlisting}
@@ -578,6 +580,8 @@ El TAD Diccionario está observado con un diccionario dict.
 \pred{pertenece}{D : $DicArr<K,V>$, e: $Tupla<K,V>$}
 {\existe[unalinea]{i}{Z}{0 \le i < D.tam \yLuego D.data[i] = e}}
 
+\pagebreak
+
 \begin{lstlisting}
 	proc diccionarioVacio() : DicArr<K,V> // O(1)
 		res := new DicArr<K,V>
@@ -709,7 +713,7 @@ El TAD Diccionario está observado con un diccionario dict.
 
 	proc tamanio(in D:DictEnlazado<K,V>) : Z // O(1)
 		return D.data.length
-
+	}
 \end{lstlisting}
 
 \end{document}
