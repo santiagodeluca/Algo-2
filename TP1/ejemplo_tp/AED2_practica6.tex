@@ -716,4 +716,105 @@ El TAD Diccionario está observado con un diccionario dict.
 	}
 \end{lstlisting}
 
+$
+Nodo es Array<Nodo>
+
+proc esHoja(p:Pila) : bool
+	actual = p.tope
+	i := 0 
+	while i < 27 && actual[i] == null
+		i++
+	endwhile
+	return i == 27
+
+proc hayPalabraMasGrande(in p:Pila<Nodo>, in pos:int)
+	actual = p.tope
+	i := pos
+	res := False
+
+	while i < 27
+		if actual[i] != null
+			res = true
+		endif
+		i++
+	endwhile
+
+buscarIntervalo(in T:Trie, in p1:Array<Char>, in p2:Array<Char>) : Vector<Vector<Char>>
+	res = new Vector<Vector<Char>>
+	P = new Pila<Nodo>
+	apilarPalabra(T, P, p1)
+
+	while !sonIguales(res[res.length], p2)
+		res.agregarAtras(proximo(P, ))
+		
+
+proc siguiente(P: Pila<Nodo>, p2:Vector<char>, sig : Vector<Char>, anterior : Vector<Char>)
+	actual = P.tope
+	if noHayMasLetras(actual) && sonIguales(anterior, sig)
+		P.desapilar
+		sig.eliminar(sig.length - 1)
+		siguiente(P, p2, sig, anterior)
+	else if noHayMasLetras(actual)
+		return
+	else
+		letra
+
+proc sonIguales(v1 :Vector<Char>, v2:Vector<Char>)
+	res := true
+	i:= 0 
+	while i < v1.length
+		if v2.length < i || v1[i] != v2[i] then
+			res := False
+		endif
+	endwhile
+	if v2.length != v1.length
+		res := False
+	endif
+	return res
+
+apilarPalabra(in T:Trie, inout P:Pila<Nodo>, in p1:Array<Char>)
+	actual := T.raiz
+	P.apilar(actual)
+	i := 0 
+	while i<p1.length
+		P.apilar(actual[ord(p1[i])])
+	endwhile
+
+
+
+Ejercicio 13 
+uso un trie que tiene en cada nodo 27 + 27 + 1 nodos, los primeros 27 son las letras minusculas,
+los segundos 27 las mayusculas y el ultimo la posicion especial donde se guarda la palabra
+Nodo es Array<Nodo>
+
+proc patronCamelCase(in T:Trie, in patron:Array<Char>) Array<Array<Char>>
+	res = new Array<Array<Char>>[0]
+	actual = T.raiz
+	if T.raiz[ord(patron[0])] == null
+		return res
+	else
+	
+proc buscarTodos(in actual:Nodo, palabra: Vector<Char>, patron : Vector<Char, res: Vector<Vector<Char>)
+	i = 0
+	while i < 54
+		if actual[i] != null
+			if actual[55] != null && patron.length == 0
+				res.agregarAtras(palabra)
+			if i < 27
+				palabra.agregarAtras(char(i))
+				buscarTodos(actual[i], palabra, patron, res)
+			else if i >= 27 && char(i) == patron.obtener(0)
+				palabra.agregarAtras(patron.obtener(0))
+				buscarTodos(actual[i], palabra, patron.eliminar(0), res)
+			endif
+			
+
+
+
+proc buscarPatron(in actual:Nodo, in p:Array<Char>) : Array<Char>
+	if noHayMasLetras(actual)
+
+$
+
+
 \end{document}
