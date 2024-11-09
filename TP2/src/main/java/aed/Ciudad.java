@@ -27,7 +27,7 @@ public class Ciudad {
         return id;
     }
     
-    public int getGanacia() {
+    public int getGanancia() {
         return ganancia;
     }
 
