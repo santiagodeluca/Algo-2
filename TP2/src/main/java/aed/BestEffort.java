@@ -114,7 +114,7 @@ public class BestEffort {
         }
     }
     public int ciudadConMayorSuperavit(){
-        return ciudades.tope(0).superavit(); // O(1)
+        return ciudades.tope(0).getId(); // O(1)
     }
 
     public ArrayList<Integer> ciudadesConMayorGanancia(){

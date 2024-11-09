@@ -6,8 +6,7 @@ public class Comparadores {
 
     public Comparator<Ciudad> comparadorSuperavit = Comparator
         .comparing(Ciudad::superavit)
-        .thenComparing(Ciudad::getId)
-        .reversed();
+        .thenComparing(Ciudad::getId, Comparator.reverseOrder());
 
     public Comparator<Ciudad> comparadorId = Comparator
         .comparing(Ciudad::getId)
@@ -15,8 +14,7 @@ public class Comparadores {
 
     public Comparator<Traslado> comparadorRedituables = Comparator
         .comparing(Traslado::getGananciaNeta) 
-        .thenComparing(Traslado::getId)       
-        .reversed();                 
+        .thenComparing(Traslado::getId, Comparator.reverseOrder());       
             
     public Comparator<Traslado> comparadoraAntiguo = Comparator
         .comparing(Traslado::getTimestamp)

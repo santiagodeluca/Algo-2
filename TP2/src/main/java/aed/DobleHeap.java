@@ -86,7 +86,7 @@ public class DobleHeap<T> {
     private void reordenarNodo(List<Handle> heap, int posicion, Comparator<T> comparador) {
         if (hayHijoConMasPrioridad(heap, posicion, comparador)) {
             bajar(heap, posicion, comparador);
-        } else if (esMenor(heap.get(posicion), heap.get(indicePadre(posicion)), comparador)) {
+        } else if (esMenor(heap.get(indicePadre(posicion)), heap.get(posicion), comparador)) {
             subir(heap, posicion, comparador);
         }
     }
@@ -125,12 +125,14 @@ public class DobleHeap<T> {
 
     public T desencolarMax(int indiceComparador) {
         if (indiceComparador == 0) { 
+            T res = heap1.get(0).valor;
             sacarSincronizado(heap1,heap2,0,comparador1,comparador2); 
-            return heap1.get(0).valor;
+            return res;
         }
         else { 
+            T res = heap2.get(0).valor ;
             sacarSincronizado(heap2,heap1,0,comparador2,comparador1); 
-            return heap2.get(0).valor;
+            return res;
         }
     }
 
@@ -160,17 +162,19 @@ public class DobleHeap<T> {
     }
 
     private void bajar(List<Handle> heap, int indice, Comparator<T> comparador) {
-        /*if (hayHijoConMasPrioridad(heap, indice, comparador)) {
+        /* if (hayHijoConMasPrioridad(heap, indice, comparador)) {
             Handle hijoAIntercambiar = hijoConMasPrioridad(heap, indice, comparador);
+            int indiceHijoAIntercambiar = hijoAIntercambiar.indice;
             intercambiar(heap,indice,hijoAIntercambiar.indice);
-            bajar(heap,hijoAIntercambiar.indice,comparador);
+            bajar(heap,indiceHijoAIntercambiar,comparador);
         }
         */
+        
         int indiceIzquierdo = indiceIzquierdo(indice);
-
         int indiceDerecho = indiceDerecho(indice);
 
         if (fueraDeRango(indiceIzquierdo)) return;
+        
         Handle elemento = heap.get(indice);
         Handle hijoIzquierdo = heap.get(indiceIzquierdo);
 
@@ -179,12 +183,16 @@ public class DobleHeap<T> {
             if (esMenor(hijoIzquierdo,hijoDerecho,comparador) && esMenor(elemento,hijoDerecho,comparador)) {
                 intercambiar(heap,indice,indiceDerecho);
                 bajar(heap,indiceDerecho,comparador);
+            } else if (esMenor(elemento,hijoIzquierdo,comparador)) {
+                intercambiar(heap,indice,indiceIzquierdo);
+                bajar(heap,indiceIzquierdo,comparador);
+
             }
         } else if (esMenor(elemento,hijoIzquierdo,comparador)) {
             intercambiar(heap,indice,indiceIzquierdo);
             bajar(heap,indiceIzquierdo,comparador);
         }
-
+        
 
     }
 
