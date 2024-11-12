@@ -5,33 +5,33 @@ public class Ciudad {
     int ganancia;
     int perdida;
 
-    public void agregarGanancia(int gan) {
+    public void agregarGanancia(int gan) { // O(1)
         ganancia = ganancia + gan;
     }
 
-    public void agregarPerdida(int per) {
+    public void agregarPerdida(int per) { // O(1)
         perdida = perdida + per;
     }
 
-    public int superavit(){
+    public int superavit(){ // O(1)
         return ganancia - perdida;
     }
 
-    public Ciudad(int identificacion, int gan, int per){
+    public Ciudad(int identificacion, int gan, int per){ // O(1)
         id = identificacion;
         ganancia = gan;
         perdida = per;
     }
 
-    public int getId() {
+    public int getId() { // O(1)
         return id;
     }
     
-    public int getGanancia() {
+    public int getGanancia() { // O(1)
         return ganancia;
     }
 
-    public int getPerdida() {
+    public int getPerdida() { // O(1)
         return perdida;
     }
 }

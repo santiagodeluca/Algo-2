@@ -40,7 +40,6 @@ public class BestEffort {
 
         Comparator<Traslado> compAntiguo = new Comparadores().comparadoraAntiguo; 
 
-
         t = new DobleHeap<Traslado>(compRedituable, compAntiguo); // O(1)
         t.heapify(traslados); // O(|T|)
     }
@@ -68,7 +67,7 @@ public class BestEffort {
         return res;
     }
     
-    public int[] despacharMasAntiguos(int n){ //O(n (log(|T|) + log(|C|)))
+    public int[] despacharMasAntiguos(int n){ //O(n * (log(|T|) + log(|C|)))
         ArrayList<Integer> temp = new ArrayList<Integer>();
     
         for (int i = 0; i < n && !t.esVacio(); i++) { // O(n)
@@ -85,47 +84,47 @@ public class BestEffort {
     }
     
     private void actualizaCiudadesDespuesDeTraslado(Traslado tras) { // O(log|C|)
-        Ciudad ori = ciudades.obtenerPosicion(1, tras.origen); // O(log|C|)
-        Ciudad des = ciudades.obtenerPosicion(1, tras.destino);// O(log|C|)
+        Ciudad ori = ciudades.obtenerPosicion(1, tras.origen); // O(1)
+        Ciudad des = ciudades.obtenerPosicion(1, tras.destino);// O(1)
     
-        Ciudad origenActualizado = new Ciudad(ori.getId(), ori.getGanancia() + tras.gananciaNeta, ori.getPerdida());
-        Ciudad destinoActualizado = new Ciudad(des.getId(), des.getGanancia(), des.getPerdida() + tras.gananciaNeta);
+        Ciudad origenActualizado = new Ciudad(ori.getId(), ori.getGanancia() + tras.gananciaNeta, ori.getPerdida()); // O(1)
+        Ciudad destinoActualizado = new Ciudad(des.getId(), des.getGanancia(), des.getPerdida() + tras.gananciaNeta); // O(1)
     
         ciudades.modificarPosicion(1, ori.getId(), origenActualizado); // O (log|C|)
         ciudades.modificarPosicion(1, des.getId(), destinoActualizado); // O (log|C|)
     
-        trasladosDespachados += 1;
-        gananciasGlobales += tras.gananciaNeta;
+        trasladosDespachados += 1; // O(1)
+        gananciasGlobales += tras.gananciaNeta; // O(1)
 
-        Ciudad ciudadMayorGananciaPrevia = ciudades.obtenerPosicion(1, gananciasMaximas.get(0));
-        if (origenActualizado.getId() == ciudadMayorGananciaPrevia.getId() || origenActualizado.getGanancia() > ciudadMayorGananciaPrevia.getGanancia()) { // O(log |C|)
-            gananciasMaximas = new ArrayList<Integer>();
-            gananciasMaximas.add(origenActualizado.getId());
-        } else if (origenActualizado.getGanancia() == ciudadMayorGananciaPrevia.getGanancia()) { // O(log |C|)
-            gananciasMaximas.add(origenActualizado.getId());
+        Ciudad ciudadMayorGananciaPrevia = ciudades.obtenerPosicion(1, gananciasMaximas.get(0)); // O(1)
+        if (origenActualizado.getId() == ciudadMayorGananciaPrevia.getId() || origenActualizado.getGanancia() > ciudadMayorGananciaPrevia.getGanancia()) {
+            gananciasMaximas = new ArrayList<Integer>(); // O(1)
+            gananciasMaximas.add(origenActualizado.getId()); // O(1)
+        } else if (origenActualizado.getGanancia() == ciudadMayorGananciaPrevia.getGanancia()) {
+            gananciasMaximas.add(origenActualizado.getId()); // O(1)
         }
 
-        Ciudad ciudadMayorPerdidaPrevia = ciudades.obtenerPosicion(1, perdidasMaximas.get(0));
-        if (destinoActualizado.getId() == ciudadMayorPerdidaPrevia.getId() || destinoActualizado.getPerdida() > ciudadMayorPerdidaPrevia.getPerdida()) { // O(log |C|)
-            perdidasMaximas = new ArrayList<Integer>();
-            perdidasMaximas.add(destinoActualizado.getId());
-        } else if (destinoActualizado.getPerdida() == ciudadMayorPerdidaPrevia.getPerdida()) { // O(log |C|)
-            perdidasMaximas.add(destinoActualizado.getId());
+        Ciudad ciudadMayorPerdidaPrevia = ciudades.obtenerPosicion(1, perdidasMaximas.get(0)); // O(1)
+        if (destinoActualizado.getId() == ciudadMayorPerdidaPrevia.getId() || destinoActualizado.getPerdida() > ciudadMayorPerdidaPrevia.getPerdida()) {
+            perdidasMaximas = new ArrayList<Integer>(); // O(1)
+            perdidasMaximas.add(destinoActualizado.getId()); // O(1)
+        } else if (destinoActualizado.getPerdida() == ciudadMayorPerdidaPrevia.getPerdida()) {
+            perdidasMaximas.add(destinoActualizado.getId()); // O(1)
         }
     }
-    public int ciudadConMayorSuperavit(){
+    public int ciudadConMayorSuperavit(){ // O(1)
         return ciudades.tope(0).getId(); // O(1)
     }
 
-    public ArrayList<Integer> ciudadesConMayorGanancia(){
+    public ArrayList<Integer> ciudadesConMayorGanancia(){ // O(1)
         return gananciasMaximas;
     }
 
-    public ArrayList<Integer> ciudadesConMayorPerdida(){
+    public ArrayList<Integer> ciudadesConMayorPerdida(){ // O(1)
         return perdidasMaximas;
     }
 
-    public int gananciaPromedioPorTraslado(){
+    public int gananciaPromedioPorTraslado(){ // O(1)
         return (gananciasGlobales / trasladosDespachados);
     }
     
