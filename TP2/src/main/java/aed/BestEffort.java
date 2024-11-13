@@ -77,7 +77,7 @@ public class BestEffort {
             actualizaCiudadesDespuesDeTraslado(tras); // O(log |C|)
         }
         int[] res = new int[temp.size()]; // O(n)
-        for (int i = temp.size() - 1; i >= 0; i--) { // O(n)
+        for (int i = 0; i < temp.size(); i++) { // O(n)
             res[i] = temp.get(i); //O(1)
         }
         return res;
@@ -125,7 +125,12 @@ public class BestEffort {
     }
 
     public int gananciaPromedioPorTraslado(){ // O(1)
-        return (gananciasGlobales / trasladosDespachados);
+        int res;
+        if (trasladosDespachados != 0) {
+            res = (gananciasGlobales / trasladosDespachados);
+        } else
+            res = 0;
+        return res;
     }
     
 }
