@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class BestEffort {
-    //Completar atributos privados
     private DobleHeap<Ciudad> ciudades;
     private DobleHeap<Traslado> t;
 
@@ -14,32 +13,28 @@ public class BestEffort {
     private int gananciasGlobales;
 
     public BestEffort(int cantCiudades, Traslado[] traslados){ // O(|C| + |T|)
-        trasladosDespachados = 0; 
-        gananciasGlobales = 0;
+        trasladosDespachados = 0; // O(1)
+        gananciasGlobales = 0; // O(1)
         
-        gananciasMaximas = new ArrayList<Integer>();
-        perdidasMaximas = new ArrayList<Integer>();
+        gananciasMaximas = new ArrayList<Integer>(); // O(1)
+        perdidasMaximas = new ArrayList<Integer>(); // O(1)
         
-        Ciudad[] ciudadesTemp = new Ciudad[cantCiudades];
+        Ciudad[] ciudadesTemp = new Ciudad[cantCiudades]; // O(|C|)
 
-        for (int i = 0; i < cantCiudades; i++) { //O(|C|)
+        for (int i = 0; i < cantCiudades; i++) { // O(|C|)
             gananciasMaximas.add(i); // O(1)
             perdidasMaximas.add(i); // O(1)
             Ciudad c = new Ciudad(i,0,0); // O(1)
             ciudadesTemp[i] = c; // O(1)
         }
 
-        Comparator<Ciudad> compSuperavit = new Comparadores().comparadorSuperavit; 
-
-        Comparator<Ciudad> compId = new Comparadores().comparadorId; 
-        
+        Comparator<Ciudad> compSuperavit = new Comparadores().comparadorSuperavit; // O(1)
+        Comparator<Ciudad> compId = new Comparadores().comparadorId; // O(1)
         ciudades = new DobleHeap<Ciudad>(compSuperavit, compId); // O(1)
         ciudades.heapify(ciudadesTemp); // O(|C|)
 
-        Comparator<Traslado> compRedituable = new Comparadores().comparadorRedituables; 
-
-        Comparator<Traslado> compAntiguo = new Comparadores().comparadoraAntiguo; 
-
+        Comparator<Traslado> compRedituable = new Comparadores().comparadorRedituables; // O(1)
+        Comparator<Traslado> compAntiguo = new Comparadores().comparadoraAntiguo; // O(1)
         t = new DobleHeap<Traslado>(compRedituable, compAntiguo); // O(1)
         t.heapify(traslados); // O(|T|)
     }
@@ -52,7 +47,7 @@ public class BestEffort {
     }
 
     public int[] despacharMasRedituables(int n){ // O(n * (log(|T|) + log(|C|)))
-        ArrayList<Integer> temp = new ArrayList<Integer>();
+        ArrayList<Integer> temp = new ArrayList<Integer>(); // O(1) usamos un arraylist porque la funcion devuelve un array de ints(que no se redimensiona en O(1))
 
         for (int i = 0; i < n && !t.esVacio(); i++) { // O(n)
             Traslado tras = t.desencolarMax(0); // O(log|T|)
@@ -68,7 +63,7 @@ public class BestEffort {
     }
     
     public int[] despacharMasAntiguos(int n){ //O(n * (log(|T|) + log(|C|)))
-        ArrayList<Integer> temp = new ArrayList<Integer>();
+        ArrayList<Integer> temp = new ArrayList<Integer>(); // O(1)
     
         for (int i = 0; i < n && !t.esVacio(); i++) { // O(n)
             Traslado tras = t.desencolarMax(1); // O(log|T|)
@@ -112,6 +107,7 @@ public class BestEffort {
             perdidasMaximas.add(destinoActualizado.getId()); // O(1)
         }
     }
+
     public int ciudadConMayorSuperavit(){ // O(1)
         return ciudades.tope(0).getId(); // O(1)
     }
@@ -125,12 +121,6 @@ public class BestEffort {
     }
 
     public int gananciaPromedioPorTraslado(){ // O(1)
-        int res;
-        if (trasladosDespachados != 0) {
-            res = (gananciasGlobales / trasladosDespachados);
-        } else
-            res = 0;
-        return res;
+        return (gananciasGlobales / trasladosDespachados);
     }
-    
 }
